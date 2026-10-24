@@ -159,7 +159,7 @@ erDiagram
 
 ### Why a course mapping table?
 
-The course of an ad is read from the **prefix of its name**: an ad named `DI_<ad name>` belongs to the course coded `DI`. This naming rule only applies **from the beginning of 2026**. Before that, ad names were free text, so the course cannot be read from the name. `dim_ad_course_mapping` fills the gap: it maps the ads that do not follow the new rule (by exact name, by a phrase in the name, or by campaign + ad name) to a course, and it also holds the prefix → course rules for the new naming. An ad that matches no rule has no course, so a new row is added by hand.
+From the beginning of 2026, the course of an ad is read from the **prefix of its name**: an ad named `DI_<ad name>` belongs to the course coded `DI`. Before that, ad names were free text, so the course cannot be read from the name. For those ads, a mapping table kept by hand in a Google Sheet pairs each course with its ad names. `dim_ad_course_mapping` brings both together.
 
 Sample of the table (course and ad names are fictional):
 
@@ -206,5 +206,5 @@ fb-ads-lead-attribution/
 The structure and logic come from the real pipeline. In this public copy:
 
 - The GCP project ID is a placeholder (`your-project-id`).
-- Course names, ad names and campaign names in [`dim_ad_course_mapping`](transform/definitions/marts/dim_ad_course_mapping.sqlx) are **fictional**; the matching rules (prefix / exact / contains / campaign + ad) are unchanged.
+- Course names, ad names and campaign names in [`dim_ad_course_mapping`](transform/definitions/marts/dim_ad_course_mapping.sqlx) are **fictional**; the matching rules are unchanged.
 - No ad account IDs, tokens or customer records are included. The dashboard screenshots show figures from a past period, with ad names, account names, dates and the course column blurred.
