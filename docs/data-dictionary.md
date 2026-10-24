@@ -12,35 +12,35 @@ Star schema at **ad** grain: `fact_ad_performance` joins to `dim_ads`, which joi
 
 **Grain:** one row per ad per day (data from 2026-01-01)
 
-| Field | Definition | Data Quality Consideration |
-|---|---|---|
-| `ad_id` | Ad | FK to `dim_ads.ad_id`. With `date_start`, should be unique |
-| `date_start`, `date_stop` | Day of the data (ad account time zone) | Daily rows, so both are the same day |
-| `spend` | Amount spent (account currency) | |
-| `reach` | People reached that day | **Not additive across days** |
-| `impressions` | Times the ad was shown | |
-| `frequency` | Average times a person saw the ad that day | Do not average it across rows; use Impressions / Reach |
-| `clicks` | All clicks (links, likes, comments, shares) | Not the same as link clicks |
-| `inline_link_clicks` | Clicks on the link in the ad (the Traffic metric) | Use this for CTR / CPC, not `clicks` |
-| `landing_page_views` | People who reached the landing page | From the `landing_page_view` action. NULL when the ad had none that day |
+| Field | Definition |
+|---|---|
+| `ad_id` | Ad |
+| `date_start`, `date_stop` | Day of the data (ad account time zone) |
+| `spend` | Amount spent (account currency) |
+| `reach` | People reached that day |
+| `impressions` | Times the ad was shown |
+| `frequency` | Average times a person saw the ad that day |
+| `clicks` | All clicks (links, likes, comments, shares) |
+| `inline_link_clicks` | Clicks on the link in the ad (the Traffic metric) |
+| `landing_page_views` | People who reached the landing page |
 
 ## `dim_ads`
 
 **Grain:** one row per ad that has insights data
 
-| Field | Definition | Data Quality Consideration |
-|---|---|---|
-| `ad_id` | Ad | Should be unique and non-null |
-| `ad_set_id` | Ad set | FK to `dim_ad_sets.ad_set_id` |
-| `ad_name` | Ad name | Since early 2026 names start with a course code (`DI_<ad name>`), which drives the course mapping. Older ads have free-text names |
-| `ad_status` | Ad status | |
-| `ad_type` | Creative object type (link, video, photo, status...) | |
-| `ad_link` | Link to the Facebook post (`facebook.com/<page>/posts/<post>`) | NULL when the creative has no story ID |
-| `ad_cta_type` | Call-to-action button type | |
-| `ad_cta_link` | Landing page link | Recovered through fallbacks, see [Data Quality](./data-quality.md) |
-| `ad_utm_source`, `ad_utm_medium`, `ad_utm_campaign`, `ad_utm_content` | UTM of the link | NULL when the link is missing or has no UTM |
-| `ad_copy_text` | Caption text | |
-| `course_name` | Standard course name from `dim_ad_course_mapping` | NULL when no mapping rule matches. The portfolio (AI, Data, EE, MKT) is derived from it in Power BI, it is not a column of the mart |
+| Field | Definition |
+|---|---|
+| `ad_id` | Ad |
+| `ad_set_id` | Ad set |
+| `ad_name` | Ad name |
+| `ad_status` | Ad status |
+| `ad_type` | Creative object type (link, video, photo, status...) |
+| `ad_link` | Link to the Facebook post (`facebook.com/<page>/posts/<post>`) |
+| `ad_cta_type` | Call-to-action button type |
+| `ad_cta_link` | Landing page link |
+| `ad_utm_source`, `ad_utm_medium`, `ad_utm_campaign`, `ad_utm_content` | UTM of the link |
+| `ad_copy_text` | Caption text |
+| `course_name` | Standard course name from `dim_ad_course_mapping`. The portfolio (AI, Data, EE, MKT) is derived from it in Power BI, it is not a column of the mart |
 
 ## `dim_ad_sets`
 
@@ -81,3 +81,4 @@ Star schema at **ad** grain: `fact_ad_performance` joins to `dim_ads`, which joi
 | `ad_key` | Text the ad name is compared with |
 | `campaign_pattern` | Campaign name, used only by `campaign_ad` rules |
 | `course_selected` | Standard course name returned |
+

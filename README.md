@@ -1,6 +1,6 @@
 # Facebook Ads Dashboard: Which Ads Bring Leads?
 
-> A **Power BI dashboard** that shows how Facebook Ads perform against their objective and how many **leads (registrations) each ad converts**. It reads a BigQuery data mart fed daily by **Airbyte → BigQuery → Dataform**, and joins ads to CRM leads through the **UTM** in each ad's link. This is the **ads side** of the company data warehouse; the **CRM side** is [crm-data-warehouse](https://github.com/tuhoang3112/crm-data-warehouse), in the same BigQuery warehouse.
+> A **Power BI dashboard** that shows how Facebook Ads perform against their objective and how many **leads (registrations) each ad converts**. It reads a BigQuery **data mart** (clean tables, ready for analysis) fed daily by **Airbyte → BigQuery → Dataform**, and joins ads to CRM leads through the **UTM** in each ad's link. This is the **ads side** of the company data warehouse; the **CRM side** is [crm-data-warehouse](https://github.com/tuhoang3112/crm-data-warehouse), in the same BigQuery warehouse.
 
 > **Status:** the data pipeline and data mart are built (this repo). The Power BI model and the dashboard are being added to this repository step by step, with demo data so they can be shared.
 
@@ -8,21 +8,23 @@
 
 ## The problem
 
-The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), and the conversion is a **form fill on the landing page**. The Pixel can report the form-fill event to Facebook, but only the CRM holds the lead itself: who it is, which course, its value and whether it was won. Leads land in the CRM with a UTM tag but no link to a specific ad.
+The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), and the conversion is a **form fill on the landing page**. The lead itself (who it is, which course, its value, whether it was won) lives in the CRM, with a UTM tag but no link to a specific ad.
 
 - There was no proper dashboard. To see how ads performed, the team had to open Ads Manager, or download the data and analyse it by hand.
 - Nothing connected **an ad to the leads it produced**, so "which ad creates the most leads, for which course?" had no answer.
-- To judge an ad by the leads it brings, the team had to build a report by hand and count leads one by one, which took a lot of time.
-
-**Goal:** measure how many **leads (registrations) each ad converts**. Daily, automatic ad performance, with every ad carrying its **CTA link, UTM and course**, so ads can be joined to CRM leads without manual mapping.
 
 ---
 
-## Analysis
+## Goal & Final Results
 
-The mart is used in two ways.
+**Goal:** a dashboard that lets the team track ad performance along the whole funnel: awareness (reach) → click → LDP view → lead. Data refreshes automatically every day, and every ad carries its **CTA link, UTM and course**, so ads can be joined to CRM leads without manual mapping.
 
-### 1. Build a dashboard
+**Final results:** the Facebook Ads data in BigQuery is used in two ways:
+
+- **Dashboard**: tracking ad performance every day, along the whole funnel.
+- **Ad hoc analysis**: quick questions, answered straight from the data.
+
+### 1. Dashboard
 
 For regular monitoring of every ad. The questions it answers:
 
@@ -45,8 +47,8 @@ For regular monitoring of every ad. The questions it answers:
 
 **Page 2: Ads Detail.** Drill-down to each ad.
 
-- Top Clicked Ads (CTR against impressions) and Top Converted Ads (leads and CPL)
-- Table per ad: ID, name, ad preview link, course, objective, start and end date, duration in days, amount spent, impressions, reach, frequency
+- Top Clicked Ads (CTR against impressions), Top Messaging Started Ads (messages started and CPCM) and Top Converted Ads (leads and CPL)
+- Table per ad: ID, name, ad preview link, course, objective, start and end date, duration in days, and the metrics: Amount spent, Impressions, Reach, Frequency, CPM, Messaging started, CPCM, Link clicks, CPC, CTR, LDP views, Lead, CPL (CPC), Lead value
 
 ![Ads Detail](docs/images/dashboard-ads-detail.png)
 
@@ -63,7 +65,7 @@ Each ad is read with the metrics of its own objective → [Metric Definitions](d
 
 ### 2. Ad hoc analysis
 
-For a quick question the dashboard does not answer yet, an AI agent queries the BigQuery marts, aggregates the numbers and writes the commentary, instead of exporting files and analysing them by hand.
+For a quick question the dashboard does not answer yet, an AI agent queries the data in BigQuery, aggregates the numbers and writes the commentary.
 
 The report is a monthly view by **portfolio, course and ad**:
 
@@ -72,9 +74,7 @@ The report is a monthly view by **portfolio, course and ad**:
 - **CPL** is calculated per lead, per MQL and per won.
 - The commentary reads two things: **lead volume and quality** (MQL rate) and **closing ability** (Won / MQL). It uses tiers and flags small samples, so a 100% rate on 2 leads is not read as a result.
 
-→ [analysis/sample-ad-report.xlsx](analysis/sample-ad-report.xlsx): same structure as the real report, with **demo data (randomly generated)**.
-
-A **portfolio** (AI, Data, EE, MKT) is a group of courses. It is not stored in the mart: it is derived from the course name, as a custom column in Power BI, and used to filter.
+→ [analysis/sample-ad-report.md](analysis/sample-ad-report.md) (readable on GitHub) and [analysis/sample-ad-report.xlsx](analysis/sample-ad-report.xlsx) (full workbook): same structure as the real report, with **demo data (randomly generated)**.
 
 ---
 
@@ -104,7 +104,7 @@ flowchart TD
 | `dim_ads` | 1 row per ad | CTA link, UTM, ad type, post link, **course name** |
 | `dim_ad_sets` | 1 row per ad set | Effective budget (CBO / ABO) and flattened targeting |
 | `dim_campaigns` | 1 row per campaign | Objective, status, account name |
-| `dim_ad_course_mapping` | 1 row per mapping rule | Maps ad names to a standard course name. Maintained by hand ([why](#why-a-course-mapping-table)) |
+| `dim_ad_course_mapping` | 1 row per mapping rule | Maps ad names to a standard course name. Needed because only ads named from 2026 carry a course prefix (`DI_...`); older names are free text. Maintained by hand ([details](#why-a-course-mapping-table)) |
 
 Relationships in the mart (key columns only). The lead side is added in the Power BI model, through the UTM columns of `dim_ads`:
 
@@ -161,76 +161,24 @@ erDiagram
 
 The course of an ad is read from the **prefix of its name**: an ad named `DI_<ad name>` belongs to the course coded `DI`. This naming rule only applies **from the beginning of 2026**. Before that, ad names were free text, so the course cannot be read from the name. `dim_ad_course_mapping` fills the gap: it maps the ads that do not follow the new rule (by exact name, by a phrase in the name, or by campaign + ad name) to a course, and it also holds the prefix → course rules for the new naming. An ad that matches no rule has no course, so a new row is added by hand.
 
+Sample of the table (course and ad names are fictional):
+
+| mapping_type | ad_key | campaign_pattern | course_selected |
+|---|---|---|---|
+| prefix | `DI` | *null* | Digital Foundation Course |
+| prefix | `SQL` | *null* | SQL Basics Course |
+| prefix | `MCI` | *null* | Career Interview Prep |
+| exact | `ROI` | *null* | Dashboard Design Fundamentals |
+| contains | `3 questions every executive` | *null* | Executive Program A |
+| campaign_ad | `New Engagement Ad` | `Python - Engage - Forecast analysis - 10092024` | Python Basics Course |
+
 ---
 
 ## Behind the dashboard: the data pipeline
 
 `Facebook Marketing API → Airbyte → BigQuery (raw) → Dataform (staging → marts) → Power BI`
 
-### Sources & ingestion
-
-| Stream | What it holds |
-|---|---|
-| `campaigns` | Objective, budget, status |
-| `ad_sets` | Targeting, budget, promoted pixel / event |
-| `ads` | Ad name, status, link to the creative |
-| `ad_creatives` | Caption, CTA link, `url_tags`, `object_story_spec` |
-| `ads_insights` | Daily performance per ad (spend, impressions, reach, clicks, `actions`) |
-
-→ [ingestion/README.md](ingestion/README.md) (token permissions, API rate limits)
-
-
-### Architecture decisions
-
-| Decision | Choice | Why |
-|---|---|---|
-| **Warehouse** | **BigQuery** | Same warehouse as the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse), so both marts can be joined |
-| **ETL or ELT** | **ELT** | Facebook data arrives with nested JSON (targeting, creatives, actions). It is loaded raw and flattened in SQL, so a logic fix is re-applied to all history |
-| **Ingestion tool** | **Airbyte (self-hosted)**, built-in *Facebook Marketing* source | The source already has every stream needed. No custom connector (unlike the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse)) |
-| **Transformation** | **Dataform** | SQLX + Git, dependency graph with `ref()`, runs inside BigQuery |
-| **BI** | **Power BI** | Reads the marts directly. Same BI tool as the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse) |
-| **Schema** | Fact + dimensions, fact at 1 row per ad per day | Matches the grain of the Facebook insights data |
-
-
-### Transformation & data quality
-
-Dataform builds **5 staging views → 5 mart tables**. The hard part is the CTA link: out of 555 creatives, 287 had no link in the official fields. A caption-regex fallback cut the creatives without UTM from 208 to 140, and only **2 ads from 2026** (the ones with real data) remained without a usable UTM.
-→ [docs/data-quality.md](docs/data-quality.md) · [transform/README.md](transform/README.md)
-
-How the CTA link and UTM are recovered:
-
-```mermaid
-flowchart TD
-  L1["1. link_url"] --> L2["2. object_story_spec<br/>link_data.link"]
-  L2 --> L3["3. object_story_spec<br/>video CTA link"]
-  L3 --> L4["4. carousel<br/>first child link"]
-  L4 --> L5["5. first URL typed<br/>in the caption (regex)"]
-  L5 --> CTA["cta_link"]
-  CTA --> UTM["UTM read from<br/>url_tags, then link_url,<br/>then the link in the caption"]
-```
-
-How many creatives were still missing a UTM:
-
-```mermaid
-flowchart LR
-  A["208<br/>creatives without UTM<br/>(before the caption fallback)"] --> B["140<br/>still without UTM<br/>(after the fallback)"]
-  B --> C["20<br/>of them have<br/>delivery data"]
-  C --> D["2<br/>belong to 2026"]
-```
-
-
-### Orchestration
-
-Runs on the same VM and the same pattern as the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse): Airbyte sync → Dataform run → Power BI refresh.
-→ [orchestration/README.md](orchestration/README.md)
-
-```mermaid
-flowchart LR
-  A["Start VM"] --> B["Airbyte sync<br/>Facebook → BigQuery raw"]
-  B --> C["Stop VM"]
-  B --> D["Dataform run<br/>staging → marts"]
-  D --> E["Power BI refresh"]
-```
+Sources, architecture decisions, transformation and orchestration: [docs/data-pipeline.md](docs/data-pipeline.md)
 
 ---
 
@@ -245,7 +193,8 @@ fb-ads-lead-attribution/
 └── docs/
     ├── metric-definitions.md   # metrics per campaign objective
     ├── data-dictionary.md      # column definitions
-    └── data-quality.md         # CTA link / UTM recovery, coverage, known gaps
+    ├── data-pipeline.md        # sources, architecture decisions, transformation, orchestration
+    └── data-quality.md         # CTA link / UTM recovery, coverage, course mapping
 ```
 
 ## Related

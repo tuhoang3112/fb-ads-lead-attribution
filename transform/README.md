@@ -2,17 +2,21 @@
 
 Dataform builds **5 staging views → 5 mart tables** on top of the raw Airbyte tables.
 
-```text
-declarations (raw)         staging (views)             marts (tables)
-──────────────────         ───────────────             ──────────────
-campaigns       ─────────► stg_campaigns   ──┬───────► dim_campaigns
-ad_sets         ─────────► stg_ad_sets     ──┼───────► dim_ad_sets
-ads             ─────────► stg_ads         ──┤
-ad_creatives    ─────────► stg_ad_creatives┴─┬───────► dim_ads ◄── dim_ad_course_mapping
-ads_insights    ─────────► stg_ads_insights ─┴───────► fact_ad_performance
+```mermaid
+flowchart LR
+  campaigns --> stg_campaigns --> dim_campaigns
+  ad_sets --> stg_ad_sets --> dim_ad_sets
+  ads --> stg_ads --> dim_ads
+  ad_creatives --> stg_ad_creatives --> dim_ads
+  ads_insights --> stg_ads_insights --> fact_ad_performance
+  dim_ad_course_mapping --> dim_ads
 ```
 
-`dim_campaigns` takes `account_name` from `stg_ads_insights`, and `dim_ads` takes its base list of ads from it, because the campaign API does not return the account name and only ads with data matter.
+The diagram shows the main path of each table. Three tables also read another staging view:
+
+- `dim_campaigns` takes `account_name` from `stg_ads_insights`, because the campaign API does not return the account name.
+- `dim_ad_sets` reads `stg_campaigns` for the budget (with a CBO campaign, the budget sits on the campaign).
+- `dim_ads` takes its base list of ads from `stg_ads_insights`, because only ads with data matter.
 
 ## Staging
 
@@ -32,31 +36,11 @@ ads_insights    ─────────► stg_ads_insights ─┴───�
 | `dim_ads` | Ad attributes + course. Course comes from `dim_ad_course_mapping` |
 | `dim_ad_sets` | Effective budget = ad set budget, else campaign budget |
 | `dim_campaigns` | Objective, status, dates, account name |
-| `dim_ad_course_mapping` | Hand-maintained rules in 4 types. Priority: `campaign_ad` > `exact` > `contains` > `prefix` (longer key first) |
+| `dim_ad_course_mapping` | Hand-maintained mapping from ad names to course names |
 
 See the [data dictionary](../docs/data-dictionary.md).
 
-## Course mapping rules
+## Course mapping
 
-The course of an ad is read from the prefix of its name (`DI_<ad name>` → the course coded `DI`). That naming rule only applies from the beginning of 2026; older ads have free-text names, so this table also maps them by exact name, phrase or campaign + ad name.
-
-| Type | Matches when |
-|---|---|
-| `campaign_ad` | Ad name **and** campaign name both equal the rule (for generic ad names reused across campaigns) |
-| `exact` | Ad name equals the rule (curly quotes are normalised) |
-| `contains` | Ad name contains the text |
-| `prefix` | Ad name starts with the code (e.g. `DA - …`), with or without a leading quote |
-
-A new ad that matches no rule gets `course_name = NULL`. Add a row to the mapping.
-
-## Before the first run
-
-- `workflow_settings.yaml` and `declarations/*.sqlx`: replace `your-project-id` with your GCP project.
-- Raw tables are expected in dataset `dw_facebook_ads` (the Airbyte destination).
-
-## Local check
-
-```bash
-cd transform
-npx @dataform/cli@3.0.52 compile
-```
+- **From 2026:** the course is read from the prefix of the ad name (`DI_<ad name>` → the course coded `DI`).
+- **Before 2026:** ad names are free text, so a mapping table, kept by hand in a Google Sheet, pairs each course with its ad names.
