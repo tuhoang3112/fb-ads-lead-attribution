@@ -1,11 +1,11 @@
 # Orchestration
 
-The Facebook Ads pipeline reuses the VM and the schedule pattern of the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse).
+The Facebook Ads pipeline runs **every day at 12:00 (noon)**. It reuses the VM and the schedule pattern of the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse).
 
 ## Flow
 
 ```text
-Daily:
+Daily, 12:00:
 Cloud Scheduler → start VM
 systemd         → Airbyte starts on boot
 Airbyte         → scheduled sync (Facebook Marketing) → BigQuery raw
@@ -22,5 +22,3 @@ Power BI        → scheduled refresh, after Dataform finishes
 | BI refresh | Power BI Service | Power BI Service |
 
 Order matters: Dataform runs **after** the Airbyte window, so the transform reads a fully loaded raw layer. Once ads are joined with CRM leads, this pipeline must also run **after the [CRM pipeline](https://github.com/tuhoang3112/crm-data-warehouse)**.
-
-> **TODO:** the exact run times for this pipeline are not written down yet. Add them once the schedule is fixed.
