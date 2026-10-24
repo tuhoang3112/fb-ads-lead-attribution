@@ -2,7 +2,7 @@
 
 > An end-to-end data system (**Airbyte → BigQuery → Dataform → Power BI**) that pulls Facebook Ads data every day, flattens the nested API fields, recovers each ad's landing-page link and **UTM**, and labels each ad with its course. The UTM is the key that lets ads be matched to CRM leads.
 
-> **Status:** ingestion → staging → data mart are built (this repo). Matching ads with CRM leads happens in the Power BI model, which is not part of this repository yet. Demo data and the live dashboard come later (see [Roadmap](#roadmap)).
+> **Status:** ingestion → staging → data mart are built (this repo). Matching ads with CRM leads happens in the Power BI model, which is being added to this repository step by step. Demo data and the live dashboard come with it (see [Roadmap](#roadmap)).
 
 ---
 
@@ -104,7 +104,7 @@ fb-ads-lead-attribution/
 
 ## Roadmap
 
-- [ ] Document the Power BI model: ads ↔ CRM leads through UTM, bridge tables, lead measures
+- [ ] Add the Power BI model (in progress): ads ↔ CRM leads through UTM, bridge tables, lead measures
 - [ ] Demo data generator (random data, same tables) so the dashboard can be shared
 - [ ] Publish the Power BI dashboard (GitHub Pages, like the CRM project)
 - [ ] Lead rate and CPL per ad as Power BI measures. Facebook Pixel / ROAS is not used: the conversion is a form fill counted in the CRM
