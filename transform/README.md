@@ -1,6 +1,6 @@
 # Transform (Dataform)
 
-Dataform builds **5 staging views → 5 mart tables** on top of the raw Airbyte tables.
+Dataform builds **5 staging views → 6 mart tables** on top of the raw Airbyte tables.
 
 ```mermaid
 flowchart LR
