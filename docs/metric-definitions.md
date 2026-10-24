@@ -55,7 +55,7 @@ The conversion is a form fill on the landing page. Leads come from the CRM and a
 |---|---|
 | **Leads (from ads)** | CRM leads with `utm_medium = cpc`, matched to the ad through UTM |
 | **Total leads** | All CRM leads in the period, whatever the UTM. Used to compare with the leads from ads |
-| **Lead rate** | Leads / Landing Page Views (how well the landing page converts) |
+| **Conversion Rate** | Leads / Landing Page Views (how well the landing page converts) |
 | **CPL** | `SUM(spend) / Leads` |
 | **Lead Value** | Deal value of those leads |
 | **Funnel** | Impressions → Link Clicks → Landing Page Views → Leads |
