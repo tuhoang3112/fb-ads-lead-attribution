@@ -161,6 +161,17 @@ erDiagram
 
 The course of an ad is read from the **prefix of its name**: an ad named `DI_<ad name>` belongs to the course coded `DI`. This naming rule only applies **from the beginning of 2026**. Before that, ad names were free text, so the course cannot be read from the name. `dim_ad_course_mapping` fills the gap: it maps the ads that do not follow the new rule (by exact name, by a phrase in the name, or by campaign + ad name) to a course, and it also holds the prefix → course rules for the new naming. An ad that matches no rule has no course, so a new row is added by hand.
 
+Sample of the table (course and ad names are fictional):
+
+| mapping_type | ad_key | campaign_pattern | course_selected |
+|---|---|---|---|
+| prefix | `DI` | *null* | Digital Foundation Course |
+| prefix | `SQL` | *null* | SQL Basics Course |
+| prefix | `MCI` | *null* | Career Interview Prep |
+| exact | `ROI` | *null* | Dashboard Design Fundamentals |
+| contains | `3 questions every executive` | *null* | Executive Program A |
+| campaign_ad | `New Engagement Ad` | `Python - Engage - Forecast analysis - 10092024` | Python Basics Course |
+
 ---
 
 ## Behind the dashboard: the data pipeline
