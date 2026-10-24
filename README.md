@@ -19,7 +19,10 @@ The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), an
 
 ## Analysis
 
-The mart is used in two ways.
+The data mart feeds two kinds of analysis:
+
+- **Dashboard**: tracking ad performance every day, along the whole funnel.
+- **Ad hoc analysis**: quick questions, answered straight from the data.
 
 ### 1. Build a dashboard
 
