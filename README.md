@@ -31,17 +31,26 @@ For regular monitoring of every ad. The questions it answers:
 - Where does the funnel leak: impressions → link clicks → landing page views → leads?
 - Is each ad working against the objective it was set up for?
 
+**Filters on every page:** date, product group (a group of courses), objective, ad, ad account.
+
 **Page 1: Ads Overview.** Performance by account, objective and course.
 
-- KPI cards: Impressions, Reach, CPC, CPM, CTR, CPL, each with its change against the prior period
-- Spend by account, objective and course
-- Trends: CPM vs impressions, clicks vs CPC
-- Funnel: Impression → Link click → Landing page view → Lead
+- 12 KPI cards, each with its change against the previous period: Impressions, Reach, Avg. Frequency, Link Clicks, CTR, CPC, CPM, Amount Spend, LDP Views, Lead, Lead Value, CPL
+- Funnel: Impressions → Link Clicks → LDP Views → Lead, with the three rates between steps: CTR, LDP View Rate, CR (LDP → Lead)
+- Amount spend and leads over time, LDP views and leads over time
+- Amount spend by objective, by account, and by course and objective
+- Trends: Impressions vs CPM, Link Clicks vs CPC
+- Table by course: spend, number of ads, LDP views, leads
 
 **Page 2: Ads Detail.** Drill-down to each ad.
 
-- Top clicked ads and top converted ads (most leads)
-- Detail table per ad: run dates, budget, objective and the metrics for that objective
+- Table per ad: ID, name, ad preview, course, objective, start and end date, duration and the metrics
+- Top Clicked Ads (CTR against impressions) and Top Converted Ads (CPL and leads)
+
+**Page 3: CPL Report.** Which ads produced leads, and what a lead costs.
+
+- List of ads that produced leads: course, leads, UTM, ad name, ad preview
+- Cost per lead by product group: spend, leads from ads against total leads, and the CPL of each
 
 Each ad is read with the metrics of its own objective → [Metric Definitions](docs/metric-definitions.md).
 
