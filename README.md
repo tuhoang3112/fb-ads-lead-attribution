@@ -45,7 +45,7 @@ For regular monitoring of every ad. The questions it answers:
 **Page 2: Ads Detail.** Drill-down to each ad.
 
 - Top Clicked Ads (CTR against impressions) and Top Converted Ads (leads and CPL)
-- Table per ad: ID, name, ad preview link, course, objective, start and end date, duration in days, amount spent, impressions, reach, frequency
+- Table per ad: ID, name, ad preview link, course, objective, start and end date, duration in days, and the metrics: Amount spent, Impressions, Reach, Frequency, CPM, Messaging started, CPCM, Link clicks, CPC, CTR, LDP views, Lead, CPL (CPC), Lead value
 
 ![Ads Detail](docs/images/dashboard-ads-detail.png)
 
