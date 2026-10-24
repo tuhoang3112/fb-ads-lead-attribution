@@ -77,7 +77,7 @@ Star schema at **ad** grain: `fact_ad_performance` joins to `dim_ads`, which joi
 
 | Field | Definition |
 |---|---|
-| `mapping_type` | `prefix`, `exact`, `contains` or `campaign_ad` |
+| `mapping_type` | `prefix` for ads named from 2026 (the course code at the start of the name). `exact`, `contains` and `campaign_ad` for older ads with free-text names: matched by the full name, by a phrase in the name, or by campaign + ad name |
 | `ad_key` | Text the ad name is compared with |
 | `campaign_pattern` | Campaign name, used only by `campaign_ad` rules |
 | `course_selected` | Standard course name returned |
