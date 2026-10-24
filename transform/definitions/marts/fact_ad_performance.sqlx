@@ -13,6 +13,7 @@ SELECT
   impressions,
   frequency,
   clicks,
+  inline_link_clicks,
   landing_page_views
 
 FROM ${ref("stg_ads_insights")}

@@ -13,7 +13,7 @@ Built in two rounds, each documented in a blog post:
 
 ## The problem
 
-The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), so Facebook never sees the lead. Leads land in the CRM with a UTM tag but no link to a specific ad.
+The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), and the conversion is a **form fill on the landing page**. Facebook never sees that lead. Leads land in the CRM with a UTM tag but no link to a specific ad.
 
 - The first dashboard showed only daily impressions, reach and spend. Totals per campaign still required opening Ads Manager.
 - Nothing connected **an ad to the leads it produced**, so "which ad creates the most leads, for which course?" had no answer.
@@ -70,7 +70,7 @@ CTA link  https://…/program?                Lead form on the landing page
 
 | Table | Grain | Notes |
 |---|---|---|
-| `fact_ad_performance` | 1 row per ad per day | Measures only: spend, reach, impressions, frequency, clicks, landing page views |
+| `fact_ad_performance` | 1 row per ad per day | Measures only: spend, reach, impressions, frequency, clicks, link clicks, landing page views |
 | `dim_ads` | 1 row per ad | CTA link, UTM, ad type, post link, **course name** |
 | `dim_ad_sets` | 1 row per ad set | Effective budget (CBO / ABO) and flattened targeting |
 | `dim_campaigns` | 1 row per campaign | Objective, status, account name |
@@ -110,10 +110,9 @@ fb-ads-lead-attribution/
 ## Roadmap
 
 - [ ] Join `dim_ads` UTM with CRM leads: leads and lead value per ad (the next blog post)
-- [ ] Add link clicks to `fact_ad_performance` (already in staging as `inline_link_clicks`)
 - [ ] Demo data generator (random data, same tables) so the dashboard can be shared
 - [ ] Publish the Power BI dashboard (GitHub Pages, like the CRM project)
-- [ ] Sales objective: conversions, conversion rate, CPA, ROAS (Pixel events not set up yet)
+- [ ] Lead rate and CPL per ad (needs the CRM join). Facebook Pixel / ROAS is not used: the conversion is a form fill counted in the CRM
 
 ## Related
 

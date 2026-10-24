@@ -21,6 +21,7 @@ Star schema at **ad** grain: `fact_ad_performance` joins to `dim_ads`, which joi
 | `impressions` | Times the ad was shown | |
 | `frequency` | Average times a person saw the ad that day | Do not average it across rows; use Impressions / Reach |
 | `clicks` | All clicks (links, likes, comments, shares) | Not the same as link clicks |
+| `inline_link_clicks` | Clicks on the link in the ad (the Traffic metric) | Use this for CTR / CPC, not `clicks` |
 | `landing_page_views` | People who reached the landing page | From the `landing_page_view` action. NULL when the ad had none that day |
 
 ## `dim_ads`

@@ -6,7 +6,9 @@ Which metrics to read depends on the **objective** the campaign was set up with.
 
 **Ratios are never stored.** They are computed in Power BI as `SUM(numerator) / SUM(denominator)` over the current filter, so they stay correct at any level (ad, campaign, course, period).
 
-**Availability** shows what `fact_ad_performance` holds today. Metrics marked *staging only* exist in `stg_ads_insights` and need to be added to the fact table.
+**Focus:** the company runs ads as **Traffic to a landing page (LDP)**, and the conversion is a **form fill on the LDP**. The core funnel is Impressions → Link Clicks → Landing Page Views → Leads. Awareness metrics are kept as supporting metrics; Engagement (messages) is out of scope.
+
+**Availability** shows what `fact_ad_performance` holds today. *Staging only* means the metric exists in `stg_ads_insights` but not in the fact table.
 
 ---
 
@@ -41,15 +43,15 @@ Goal: send people to a landing page, whatever they do next.
 
 | Metric | Formula | Availability |
 |---|---|---|
-| **Link Clicks** | Clicks on the link in the ad | *staging only* (`inline_link_clicks`) |
-| **CTR** | Link Clicks / Impressions | *staging only*. `clicks` in the fact includes likes and shares, so it overstates CTR |
-| **CPC** | `SUM(spend) / Link Clicks` | *staging only* |
+| **Link Clicks** | `SUM(inline_link_clicks)`: clicks on the link in the ad | ✅ |
+| **CTR** | Link Clicks / Impressions. `clicks` includes likes and shares, so it overstates CTR | ✅ |
+| **CPC** | `SUM(spend) / Link Clicks` | ✅ |
 | **Landing Page Views** | People who actually reached the page | ✅ |
-| **LPV rate** | Landing Page Views / Link Clicks. Separates real clicks from "ghost" clicks (user left before the page loaded) | needs Link Clicks |
+| **LPV rate** | Landing Page Views / Link Clicks. Separates real clicks from "ghost" clicks (user left before the page loaded) | ✅ |
 
-## 4. Sales (not built yet)
+## 4. Conversion = form fill (measured in the CRM)
 
-Needs the Facebook Pixel and a conversion event. Listed so the definitions are agreed in advance.
+The conversion happens on the landing page, so it is counted from **CRM leads matched through UTM** (section 5), not from a Facebook Pixel event. The Facebook Sales objective (Pixel, `Conversions`, ROAS) is not used. If it is set up later, these are the definitions:
 
 | Metric | Formula |
 |---|---|
@@ -67,6 +69,7 @@ Needs the CRM join on UTM (see the Roadmap in the README).
 | Metric | Formula |
 |---|---|
 | **Leads** | CRM leads matched to the ad through UTM |
+| **Lead rate** | Leads / Landing Page Views (how well the landing page converts) |
 | **CPL** | `SUM(spend) / Leads` |
 | **Lead Value** | Deal value of those leads |
 | **Funnel** | Impressions → Link Clicks → Landing Page Views → Leads |
