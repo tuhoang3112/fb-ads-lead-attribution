@@ -13,7 +13,7 @@ The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), an
 - There was no proper dashboard. To see how ads performed, the team had to open Ads Manager, or download the data and analyse it by hand.
 - Nothing connected **an ad to the leads it produced**. To answer "which ad creates the most leads, for which course?", the team had to build a report by hand and count leads one by one, which took a lot of time.
 
-**Goal:** measure how many **leads (registrations) each ad converts**. Daily, automatic ad performance, with every ad carrying its **CTA link, UTM and course**, so ads can be joined to CRM leads without manual mapping.
+**Goal:** a dashboard that lets the team track ad performance along the whole funnel: awareness (reach) → click → LDP view → lead. Data refreshes automatically every day, and every ad carries its **CTA link, UTM and course**, so ads can be joined to CRM leads without manual mapping.
 
 ---
 
