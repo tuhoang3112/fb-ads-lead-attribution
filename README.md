@@ -18,9 +18,13 @@ The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), an
 
 ---
 
-## Dashboard
+## Analysis
 
-The questions it answers:
+The mart is used in two ways.
+
+### 1. Build a dashboard
+
+For regular monitoring of every ad. The questions it answers:
 
 - Which ads bring the most leads, and for which course?
 - What does a lead cost (CPL) by ad, course and objective?
@@ -40,6 +44,10 @@ The questions it answers:
 - Detail table per ad: run dates, budget, objective and the metrics for that objective
 
 Each ad is read with the metrics of its own objective → [Metric Definitions](docs/metric-definitions.md).
+
+### 2. Ad hoc analysis
+
+For a quick question that the dashboard does not answer yet, query the mart directly in BigQuery instead of exporting files. Example: how did a course perform in a given month, which ads spend money without a UTM, which ads still have no course. Ready-to-run queries: [`analysis/adhoc.sql`](analysis/adhoc.sql).
 
 ---
 
@@ -206,6 +214,7 @@ fb-ads-lead-attribution/
 ├── ingestion/        # Airbyte source setup, permissions, rate limits
 ├── transform/        # Dataform: declarations, staging, marts
 ├── orchestration/    # daily schedule
+├── analysis/         # ad hoc SQL on the mart
 └── docs/
     ├── metric-definitions.md   # metrics per campaign objective
     ├── data-dictionary.md      # column definitions
