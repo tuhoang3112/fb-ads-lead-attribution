@@ -73,8 +73,6 @@ The report is a monthly view by **portfolio, course and ad**:
 
 → [analysis/sample-ad-report.md](analysis/sample-ad-report.md) (readable on GitHub) and [analysis/sample-ad-report.xlsx](analysis/sample-ad-report.xlsx) (full workbook): same structure as the real report, with **demo data (randomly generated)**.
 
-A **portfolio** (AI, Data, EE, MKT) is a group of courses. It is not stored in the mart: it is derived from the course name, as a custom column in Power BI, and used to filter.
-
 ---
 
 ## How an ad is matched to a lead
