@@ -57,7 +57,7 @@ For regular monitoring of every ad. The questions it answers:
 
 ![CPL Report](docs/images/dashboard-cpl-report.png)
 
-*Screenshots of the dashboard on data from a past period. Ad IDs, ad names, links, UTM, course names, account names and dates are hidden.*
+*Screenshots of the dashboard on data from a past period. Ad names, account names, dates and the course column are blurred.*
 
 Each ad is read with the metrics of its own objective → [Metric Definitions](docs/metric-definitions.md).
 
@@ -258,4 +258,4 @@ The structure and logic come from the real pipeline. In this public copy:
 
 - The GCP project ID is a placeholder (`your-project-id`).
 - Course names, ad names and campaign names in [`dim_ad_course_mapping`](transform/definitions/marts/dim_ad_course_mapping.sqlx) are **fictional**; the matching rules (prefix / exact / contains / campaign + ad) are unchanged.
-- No ad account IDs, tokens or customer records are included. The dashboard screenshots show aggregated figures from a past period; everything that identifies an ad, a course, an account or a date is hidden.
+- No ad account IDs, tokens or customer records are included. The dashboard screenshots show figures from a past period, with ad names, account names, dates and the course column blurred.
