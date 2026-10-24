@@ -8,20 +8,18 @@ Which metrics to read depends on the **objective** the campaign was set up with.
 
 **Focus:** every ad is set up with an objective, which decides the metrics to read, so this file is grouped by objective. Most ads run for **leads**: Traffic to a landing page (LDP), with a **form fill** as the conversion. Their core funnel is Impressions → Link Clicks → Landing Page Views → Leads. Awareness and Engagement (messages) ads run in a smaller share.
 
-**Availability** shows what `fact_ad_performance` holds today. *Staging only* means the metric exists in `stg_ads_insights` but not in the fact table.
-
 ---
 
 ## 1. Awareness
 
 Goal: brand / product recognition.
 
-| Metric | Formula | Availability |
-|---|---|---|
-| **Reach** | People who saw the ad (each person counted once) | ✅ ⚠️ Not additive across days |
-| **Impressions** | As reported by Facebook, summed over the period. Roughly Reach × Frequency | ✅ |
-| **Frequency** | As reported by Facebook: the average number of times a person saw the ad. 2 means each person saw the ad twice on average | ✅ |
-| **CPM** | `SUM(spend) / SUM(impressions) × 1000`. Main cost metric for Awareness | ✅ |
+| Metric | Formula |
+|---|---|
+| **Reach** | People who saw the ad (each person counted once). ⚠️ Not additive across days |
+| **Impressions** | As reported by Facebook, summed over the period. Roughly Reach × Frequency |
+| **Frequency** | As reported by Facebook: the average number of times a person saw the ad. 2 means each person saw the ad twice on average |
+| **CPM** | `SUM(spend) / SUM(impressions) × 1000`. Main cost metric for Awareness |
 
 **Reach pitfall.** Reach is de-duplicated per day. Summing it over days counts the same person several times. Use the daily value, or ask Facebook for the reach of the whole period.
 
@@ -29,34 +27,34 @@ Goal: brand / product recognition.
 
 Goal: start a conversation so Sales can advise and close by chat.
 
-Ads for messages still run, in a smaller share than the lead ads. The dashboard shows both metrics: in the Ads Detail table and in the Top Messaging Started Ads chart.
+Ads for messages still run, in a smaller share than the lead ads. The dashboard shows both metrics: in the Ads Detail table and in the Top Messaging Started Ads chart. They are not extracted into this mart yet.
 
-| Metric | Formula | Availability |
-|---|---|---|
-| **Messaging Conversations Started** | Conversations started from the ad | In the dashboard. Not extracted into this mart yet |
-| **CPCM** | `SUM(spend) / Messaging Conversations Started` | In the dashboard. Not extracted into this mart yet |
+| Metric | Formula |
+|---|---|
+| **Messaging Conversations Started** | Conversations started from the ad |
+| **CPCM** | `SUM(spend) / Messaging Conversations Started` |
 
 
 ## 3. Traffic
 
 Goal: send people to a landing page, whatever they do next.
 
-| Metric | Formula | Availability |
-|---|---|---|
-| **Link Clicks** | `SUM(inline_link_clicks)`: clicks on the link in the ad | ✅ |
-| **CTR** | Link Clicks / Impressions. `clicks` includes likes and shares, so it overstates CTR | ✅ |
-| **CPC** | `SUM(spend) / Link Clicks` | ✅ |
-| **Landing Page Views** | People who actually reached the page | ✅ |
-| **LPV rate** | Landing Page Views / Link Clicks. Separates real clicks from "ghost" clicks (user left before the page loaded) | ✅ |
+| Metric | Formula |
+|---|---|
+| **Link Clicks** | `SUM(inline_link_clicks)`: clicks on the link in the ad |
+| **CTR** | Link Clicks / Impressions. `clicks` includes likes and shares, so it overstates CTR |
+| **CPC** | `SUM(spend) / Link Clicks` |
+| **Landing Page Views** | People who actually reached the page |
+| **LPV rate** | Landing Page Views / Link Clicks. Separates real clicks from "ghost" clicks (user left before the page loaded) |
 
 ## 4. Conversion = form fill
 
 The conversion happens on the landing page and can be counted two ways:
 
-| Source | What it gives | Availability |
-|---|---|---|
-| **Facebook Pixel** event (the event set on the ad set, see `dim_ad_sets.pixel_custom_event`) | Conversions as Facebook counts them, per ad per day | ❌ Not in `fact_ad_performance` yet |
-| **CRM leads** matched to ads through UTM in Power BI (section 5) | The real lead: course, value, won / lost | ✅ via Power BI |
+| Source | What it gives |
+|---|---|
+| **Facebook Pixel** event (the event set on the ad set, see `dim_ad_sets.pixel_custom_event`) | Conversions as Facebook counts them, per ad per day. Not in `fact_ad_performance` yet |
+| **CRM leads** matched to ads through UTM in Power BI (section 5) | The real lead: course, value, won / lost. Counted in Power BI |
 
 The two numbers can differ (attribution window, tracking loss), so compare them rather than assume they match. Definitions for the Pixel side:
 
