@@ -1,0 +1,112 @@
+config {
+  type: "view",
+  schema: "dm_facebook_ads_view",
+  description: "Staging layer cho ad_sets - flatten JSON fields, lấy đúng mốc target thật đã set, suy luận loại ngân sách CBO/ABO"
+}
+
+SELECT
+  id AS ad_set_id,
+  campaign_id,
+  account_id,
+  name AS ad_set_name,
+  effective_status,
+  bid_strategy,
+  bid_amount,
+  daily_budget,
+  lifetime_budget,
+  budget_remaining,
+  start_time,
+  end_time,
+  created_time,
+  updated_time,
+
+  -- budget_type: infer ABO/CBO - opposite logic from campaigns. If ad_set has its own
+  -- budget set, this is ABO, otherwise NULL means budget is managed at campaign level (CBO)
+  CASE 
+    WHEN daily_budget IS NOT NULL OR lifetime_budget IS NOT NULL THEN 'ABO'
+    ELSE 'CBO'
+  END AS budget_type,
+
+  -- adlabels: organizational label for the ad set, take the first one
+  JSON_VALUE(adlabels, '$[0].id') AS adlabel_id,
+  JSON_VALUE(adlabels, '$[0].name') AS adlabel_name,
+
+  -- bid_info: bid amount depending on the optimization goal selected
+  JSON_VALUE(bid_info, '$.CPC') AS bid_info_cpc,
+  JSON_VALUE(bid_info, '$.CPM') AS bid_info_cpm,
+  JSON_VALUE(bid_info, '$.ACTIONS') AS bid_info_actions,
+
+  -- bid_constraints: min/max ROAS bounds when bidding by ROAS
+  JSON_VALUE(bid_constraints, '$.roas_average_floor') AS bid_roas_floor,
+  JSON_VALUE(bid_constraints, '$.roas_average_ceiling') AS bid_roas_ceiling,
+
+  -- promoted_object: page/pixel/event being promoted by this ad set
+  JSON_VALUE(promoted_object, '$.page_id') AS promoted_page_id,
+  JSON_VALUE(promoted_object, '$.pixel_id') AS promoted_pixel_id,
+  JSON_VALUE(promoted_object, '$.custom_event_type') AS promoted_custom_event_type,
+  JSON_VALUE(promoted_object, '$.application_id') AS promoted_application_id,
+
+  -- targeting_age_range: the ACTUAL age range set (NOT age_min/age_max, which are
+  -- just the fixed 18-65 ceiling Facebook shows when Advantage+ Audience is enabled)
+  CONCAT(
+    JSON_VALUE(targeting, '$.age_range[0]'), '-', JSON_VALUE(targeting, '$.age_range[1]')
+  ) AS targeting_age_range,
+
+  -- targeting_gender: Facebook returns an empty array when targeting ALL genders
+  -- (not missing data). genders is a numeric array: 1 = Male, 2 = Female -> map to
+  -- readable text, aggregate in case both are targeted individually (rare, usually
+  -- just one value or empty)
+  COALESCE(
+    (
+      SELECT STRING_AGG(
+        CASE v WHEN '1' THEN 'Male' WHEN '2' THEN 'Female' ELSE v END, ', '
+      )
+      FROM UNNEST(JSON_VALUE_ARRAY(targeting, '$.genders')) AS v
+    ),
+    'All'
+  ) AS targeting_gender,
+
+  -- targeting_locations: combine both regions (province/city-level) and cities
+  -- (specific city), since Facebook allows targeting by either type depending on the ad set
+  (
+    SELECT STRING_AGG(loc, ', ') FROM (
+      SELECT JSON_VALUE(r, '$.name') AS loc
+      FROM UNNEST(JSON_QUERY_ARRAY(targeting, '$.geo_locations.regions')) AS r
+      UNION ALL
+      SELECT JSON_VALUE(c, '$.name') AS loc
+      FROM UNNEST(JSON_QUERY_ARRAY(targeting, '$.geo_locations.cities')) AS c
+    )
+  ) AS targeting_locations,
+
+  -- targeting_platforms: high-level platforms running (facebook/instagram/audience_network/messenger)
+  (SELECT STRING_AGG(v, ', ') FROM UNNEST(JSON_VALUE_ARRAY(targeting, '$.publisher_platforms')) AS v) AS targeting_platforms,
+
+  -- targeting_positions: specific placement positions on each platform, combining
+  -- Facebook + Instagram into one column with labels to distinguish them
+  CONCAT(
+    'facebook: ', COALESCE((SELECT STRING_AGG(v, ', ') FROM UNNEST(JSON_VALUE_ARRAY(targeting, '$.facebook_positions')) AS v), 'not set'),
+    '\n',
+    'instagram: ', COALESCE((SELECT STRING_AGG(v, ', ') FROM UNNEST(JSON_VALUE_ARRAY(targeting, '$.instagram_positions')) AS v), 'not set')
+  ) AS targeting_positions,
+
+  -- targeting_devices: targeted devices (mobile, desktop...), all combined
+  (SELECT STRING_AGG(v, ', ') FROM UNNEST(JSON_VALUE_ARRAY(targeting, '$.device_platforms')) AS v) AS targeting_devices,
+
+  -- targeting_interests: combine all interests; ad sets using fully-open Advantage+
+  -- targeting will return NULL here
+  (
+    SELECT STRING_AGG(JSON_VALUE(interest, '$.name'), ', ')
+    FROM UNNEST(JSON_QUERY_ARRAY(targeting, '$.flexible_spec')) AS spec,
+    UNNEST(JSON_QUERY_ARRAY(spec, '$.interests')) AS interest
+  ) AS targeting_interests,
+
+  -- targeting_custom_audiences: custom audiences being targeted, all combined
+  (
+    SELECT STRING_AGG(JSON_VALUE(aud, '$.name'), ', ')
+    FROM UNNEST(JSON_QUERY_ARRAY(targeting, '$.custom_audiences')) AS aud
+  ) AS targeting_custom_audiences,
+
+  _airbyte_raw_id,
+  _airbyte_extracted_at
+
+FROM ${ref("ad_sets")}

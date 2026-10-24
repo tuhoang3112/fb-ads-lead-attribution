@@ -1,0 +1,107 @@
+config {
+  type: "view",
+  schema: "dm_facebook_ads_view",
+  description: "Staging layer cho ad_creatives - flatten JSON fields, gộp field trùng lặp"
+}
+
+SELECT
+  id AS creative_id,
+  account_id,
+  name AS creative_name,
+  title,
+  body AS ad_copy_text,              -- gộp: trùng với video_data.message, dùng chung cho cả link/video ad
+  status,
+  actor_id,
+  object_id,
+  object_type,
+  object_url,
+  object_story_id,
+  effective_object_story_id,
+  SPLIT(effective_object_story_id, '_')[SAFE_OFFSET(0)] AS page_id,
+  SPLIT(effective_object_story_id, '_')[SAFE_OFFSET(1)] AS post_id,
+
+  video_id,                          -- gộp: trùng với video_data.video_id
+  call_to_action_type AS cta_type,   -- gộp: trùng với video_data/link_data.call_to_action.type
+
+  image_url,
+  image_hash,
+  link_og_id,                        -- Open Graph ID của link
+  thumbnail_url,
+  thumbnail_data_url,
+  template_url,
+  product_set_id,
+  applink_treatment,
+  instagram_actor_id,
+  instagram_story_id,
+  instagram_permalink_url,
+  source_instagram_media_id,
+  effective_instagram_story_id,
+
+  -- CTA link: ưu tiên link_url/object_story_spec trước, fallback carousel
+-- (child_attached_media), cuối cùng tự trích URL trong caption vì nhiều ads
+-- (carousel/photo/status) không đặt link vào nút CTA, phải để link trực tiếp
+-- trong text — pattern này vẫn đang tiếp diễn tới tận 2026, không chỉ ads cũ
+COALESCE(
+  link_url,
+  JSON_VALUE(object_story_spec, '$.link_data.link'),
+  JSON_VALUE(object_story_spec, '$.video_data.call_to_action.value.link'),
+  JSON_VALUE(object_story_spec, '$.link_data.child_attached_media[0].link'),
+  REGEXP_EXTRACT(body, r'(https?://[^\s]+)')
+) AS cta_link,
+
+-- UTM: ưu tiên url_tags (Facebook đã tách sẵn), fallback link_url, cuối cùng
+-- tự tách từ chính link tìm được trong caption (áp dụng cho nhóm post để link
+-- trong text thay vì đặt vào field UTM riêng)
+COALESCE(
+  REGEXP_EXTRACT(url_tags, r'utm_source=([^&]+)'),
+  REGEXP_EXTRACT(link_url, r'utm_source=([^&]+)'),
+  REGEXP_EXTRACT(REGEXP_EXTRACT(body, r'(https?://[^\s]+)'), r'utm_source=([^&]+)')
+) AS utm_source,
+
+COALESCE(
+  REGEXP_EXTRACT(url_tags, r'utm_medium=([^&]+)'),
+  REGEXP_EXTRACT(link_url, r'utm_medium=([^&]+)'),
+  REGEXP_EXTRACT(REGEXP_EXTRACT(body, r'(https?://[^\s]+)'), r'utm_medium=([^&]+)')
+) AS utm_medium,
+
+COALESCE(
+  REGEXP_EXTRACT(url_tags, r'utm_campaign=([^&]+)'),
+  REGEXP_EXTRACT(link_url, r'utm_campaign=([^&]+)'),
+  REGEXP_EXTRACT(REGEXP_EXTRACT(body, r'(https?://[^\s]+)'), r'utm_campaign=([^&]+)')
+) AS utm_campaign,
+
+COALESCE(
+  REGEXP_EXTRACT(url_tags, r'utm_content=([^&]+)'),
+  REGEXP_EXTRACT(link_url, r'utm_content=([^&]+)'),
+  REGEXP_EXTRACT(REGEXP_EXTRACT(body, r'(https?://[^\s]+)'), r'utm_content=([^&]+)')
+) AS utm_content,
+
+  -- Headline/picture: có thể trùng title/image_url gốc, dùng COALESCE để an toàn (chưa xác nhận 100%)
+  COALESCE(title, JSON_VALUE(object_story_spec, '$.link_data.name')) AS ad_headline,
+  COALESCE(image_url, JSON_VALUE(object_story_spec, '$.link_data.picture')) AS ad_picture_url,
+  JSON_VALUE(object_story_spec, '$.link_data.description') AS ad_description,
+  JSON_VALUE(object_story_spec, '$.link_data.caption') AS ad_caption,
+  JSON_VALUE(object_story_spec, '$.video_data.title') AS video_ad_title,
+  JSON_VALUE(object_story_spec, '$.page_id') AS object_story_spec_page_id,
+  JSON_VALUE(object_story_spec, '$.instagram_actor_id') AS object_story_spec_ig_actor_id,
+
+  -- adlabels: nhãn tổ chức creative, lấy nhãn đầu tiên
+  JSON_VALUE(adlabels, '$[0].id') AS adlabel_id,
+  JSON_VALUE(adlabels, '$[0].name') AS adlabel_name,
+
+  -- template_url_spec: link đích riêng theo từng nền tảng, dùng cho Dynamic/catalog ads
+  JSON_VALUE(template_url_spec, '$.web.url') AS template_web_url,
+  JSON_VALUE(template_url_spec, '$.android.url') AS template_android_url,
+  JSON_VALUE(template_url_spec, '$.ios.url') AS template_ios_url,
+
+  -- asset_feed_spec: nội dung biến thể của Dynamic Creative, lấy biến thể đầu vì không dùng Dynamic
+  JSON_VALUE(asset_feed_spec, '$.bodies[0].text') AS asset_feed_body_text,
+  JSON_VALUE(asset_feed_spec, '$.titles[0].text') AS asset_feed_title_text,
+  JSON_VALUE(asset_feed_spec, '$.descriptions[0].text') AS asset_feed_description_text,
+  JSON_VALUE(asset_feed_spec, '$.link_urls[0].website_url') AS asset_feed_link_url,
+  JSON_VALUE(asset_feed_spec, '$.call_to_action_types[0]') AS asset_feed_cta_type,
+
+  _airbyte_raw_id,
+  _airbyte_extracted_at
+
+FROM ${ref("ad_creatives")}

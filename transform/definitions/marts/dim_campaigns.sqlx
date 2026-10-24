@@ -1,0 +1,20 @@
+config {
+  type: "table",
+  schema: "dm_facebook_ads",
+  description: "Dimension bảng campaign - account_name lấy từ ads_insights vì campaigns API không trả field này"
+}
+
+SELECT
+  c.campaign_id,
+  i.account_name,
+  c.campaign_name,
+  c.status AS campaign_status,
+  c.objective AS campaign_objective,
+  c.start_time AS campaign_start_date,
+  c.stop_time AS campaign_stop_date
+
+FROM ${ref("stg_campaigns")} c
+LEFT JOIN (
+  SELECT DISTINCT campaign_id, account_name 
+  FROM ${ref("stg_ads_insights")}
+) i USING (campaign_id)

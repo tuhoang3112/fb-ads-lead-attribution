@@ -1,0 +1,124 @@
+config {
+  type: "view",
+  schema: "dm_facebook_ads_view",
+  description: "Staging layer cho ads_insights - flatten field scalar, gộp thẳng vài metric engagement/video cần thiết mà không đổi grain (1 dòng = 1 ad + 1 ngày)"
+}
+
+SELECT
+  ad_id,
+  ad_name,
+  adset_id AS ad_set_id,
+  adset_name AS ad_set_name,
+  campaign_id,
+  campaign_name,
+  account_id,
+  account_name,
+  account_currency,
+  date_start,
+  date_stop,
+  created_time,
+  updated_time,
+  objective,
+  buying_type,
+  optimization_goal,
+  attribution_setting,
+  quality_ranking,
+  conversion_rate_ranking,
+  engagement_rate_ranking,
+
+  -- Chi phí & đấu giá
+  SAFE_CAST(spend AS NUMERIC) AS spend,
+  SAFE_CAST(social_spend AS NUMERIC) AS social_spend,
+  SAFE_CAST(wish_bid AS NUMERIC) AS wish_bid,
+  SAFE_CAST(auction_bid AS NUMERIC) AS auction_bid,
+  SAFE_CAST(auction_competitiveness AS NUMERIC) AS auction_competitiveness,
+  SAFE_CAST(auction_max_competitor_bid AS NUMERIC) AS auction_max_competitor_bid,
+
+  -- Reach & Delivery: quảng cáo có đến được đúng người không
+  SAFE_CAST(impressions AS INT64) AS impressions,
+  SAFE_CAST(reach AS INT64) AS reach,
+  SAFE_CAST(frequency AS NUMERIC) AS frequency,
+  SAFE_CAST(full_view_impressions AS NUMERIC) AS full_view_impressions,
+  SAFE_CAST(full_view_reach AS NUMERIC) AS full_view_reach,
+
+  -- Engagement: người xem có phản ứng không (click, tương tác)
+  SAFE_CAST(clicks AS INT64) AS clicks,
+  SAFE_CAST(unique_clicks AS INT64) AS unique_clicks,
+  SAFE_CAST(ctr AS NUMERIC) AS ctr,
+  SAFE_CAST(unique_ctr AS NUMERIC) AS unique_ctr,
+  SAFE_CAST(cpc AS NUMERIC) AS cpc,
+  SAFE_CAST(cpm AS NUMERIC) AS cpm,
+  SAFE_CAST(cpp AS NUMERIC) AS cpp,
+  SAFE_CAST(cost_per_unique_click AS NUMERIC) AS cost_per_unique_click,
+  SAFE_CAST(inline_link_clicks AS INT64) AS inline_link_clicks,
+  SAFE_CAST(unique_inline_link_clicks AS INT64) AS unique_inline_link_clicks,
+  SAFE_CAST(inline_link_click_ctr AS NUMERIC) AS inline_link_click_ctr,
+  SAFE_CAST(unique_link_clicks_ctr AS NUMERIC) AS unique_link_clicks_ctr,
+  SAFE_CAST(cost_per_inline_link_click AS NUMERIC) AS cost_per_inline_link_click,
+  SAFE_CAST(cost_per_unique_inline_link_click AS NUMERIC) AS cost_per_unique_inline_link_click,
+  SAFE_CAST(inline_post_engagement AS INT64) AS inline_post_engagement,
+  SAFE_CAST(cost_per_inline_post_engagement AS NUMERIC) AS cost_per_inline_post_engagement,
+  SAFE_CAST(estimated_ad_recallers AS NUMERIC) AS estimated_ad_recallers,
+  SAFE_CAST(cost_per_estimated_ad_recallers AS NUMERIC) AS cost_per_estimated_ad_recallers,
+
+  -- Canvas / Instant Experience
+  SAFE_CAST(canvas_avg_view_time AS NUMERIC) AS canvas_avg_view_time,
+  SAFE_CAST(canvas_avg_view_percent AS NUMERIC) AS canvas_avg_view_percent,
+  SAFE_CAST(instant_experience_clicks_to_open AS NUMERIC) AS instant_experience_clicks_to_open,
+  SAFE_CAST(instant_experience_clicks_to_start AS NUMERIC) AS instant_experience_clicks_to_start,
+
+  -- Lead form: chỉ giữ để đối chiếu, KHÔNG dùng làm số lead chính thức
+  -- (nguồn lead thật lấy từ CRM qua UTM, vì không dùng Facebook Lead Form)
+  SAFE_CAST(qualifying_question_qualify_answer_rate AS NUMERIC) AS qualifying_question_qualify_answer_rate,
+
+  -- ROAS: Facebook luôn trả đúng 1 phần tử (omni_purchase) -> flatten an toàn
+  SAFE_CAST(JSON_VALUE(purchase_roas, '$[0].value') AS NUMERIC) AS purchase_roas_value,
+  SAFE_CAST(JSON_VALUE(website_purchase_roas, '$[0].value') AS NUMERIC) AS website_purchase_roas_value,
+  SAFE_CAST(JSON_VALUE(mobile_app_purchase_roas, '$[0].value') AS NUMERIC) AS mobile_app_purchase_roas_value,
+
+  -- landing_page_view: KHÔNG có cột phẳng sẵn trong Insights API (khác Ads Manager UI
+  -- tự tổng hợp hiển thị), chỉ tồn tại trong mảng actions -> phải bóc riêng bằng subquery
+  (SELECT SAFE_CAST(JSON_VALUE(x, '$.value') AS NUMERIC)
+   FROM UNNEST(JSON_QUERY_ARRAY(actions)) AS x
+   WHERE JSON_VALUE(x, '$.action_type') = 'landing_page_view') AS landing_page_views,
+
+  -- view_content: xem nội dung/trang sản phẩm sau khi click, tín hiệu quan tâm gần
+  -- với landing_page_view. Facebook ghi nhận trùng qua 3 action_type khác nhau
+  -- (view_content/onsite_web_view_content/omni_view_content) nên chỉ lấy 1,
+  -- tránh cộng dồn 3 lần cho cùng 1 sự kiện
+  (SELECT SAFE_CAST(JSON_VALUE(x, '$.value') AS NUMERIC)
+   FROM UNNEST(JSON_QUERY_ARRAY(actions)) AS x
+   WHERE JSON_VALUE(x, '$.action_type') = 'view_content') AS view_content,
+
+  -- video_play_actions: tổng số lần video được phát, không có cột phẳng tương đương
+  (SELECT SAFE_CAST(JSON_VALUE(x, '$.value') AS NUMERIC)
+   FROM UNNEST(JSON_QUERY_ARRAY(video_play_actions)) AS x
+   LIMIT 1) AS video_plays,
+
+  -- video_p25/p50/p75/p95/p100_watched: % người xem hết từng mốc video, mỗi mốc
+  -- nằm trong 1 array riêng, không gộp sẵn -> bóc từng mốc thành cột riêng
+  (SELECT SAFE_CAST(JSON_VALUE(x, '$.value') AS NUMERIC)
+   FROM UNNEST(JSON_QUERY_ARRAY(video_p25_watched_actions)) AS x
+   LIMIT 1) AS video_p25_watched,
+
+  (SELECT SAFE_CAST(JSON_VALUE(x, '$.value') AS NUMERIC)
+   FROM UNNEST(JSON_QUERY_ARRAY(video_p50_watched_actions)) AS x
+   LIMIT 1) AS video_p50_watched,
+
+  (SELECT SAFE_CAST(JSON_VALUE(x, '$.value') AS NUMERIC)
+   FROM UNNEST(JSON_QUERY_ARRAY(video_p75_watched_actions)) AS x
+   LIMIT 1) AS video_p75_watched,
+
+  (SELECT SAFE_CAST(JSON_VALUE(x, '$.value') AS NUMERIC)
+   FROM UNNEST(JSON_QUERY_ARRAY(video_p95_watched_actions)) AS x
+   LIMIT 1) AS video_p95_watched,
+
+  (SELECT SAFE_CAST(JSON_VALUE(x, '$.value') AS NUMERIC)
+   FROM UNNEST(JSON_QUERY_ARRAY(video_p100_watched_actions)) AS x
+   LIMIT 1) AS video_p100_watched,
+
+  _airbyte_raw_id,
+  _airbyte_extracted_at
+
+FROM ${ref("ads_insights")}
+WHERE date_start >= '2026-01-01'
