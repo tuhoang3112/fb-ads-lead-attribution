@@ -13,18 +13,18 @@ The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), an
 - There was no proper dashboard. To see how ads performed, the team had to open Ads Manager, or download the data and analyse it by hand.
 - Nothing connected **an ad to the leads it produced**, so "which ad creates the most leads, for which course?" had no answer.
 
-**Goal:** a dashboard that lets the team track ad performance along the whole funnel: awareness (reach) → click → LDP view → lead. Data refreshes automatically every day, and every ad carries its **CTA link, UTM and course**, so ads can be joined to CRM leads without manual mapping.
-
 ---
 
-## Analysis
+## Goal & Final Results
 
-The Facebook Ads data in BigQuery is used in two ways:
+**Goal:** a dashboard that lets the team track ad performance along the whole funnel: awareness (reach) → click → LDP view → lead. Data refreshes automatically every day, and every ad carries its **CTA link, UTM and course**, so ads can be joined to CRM leads without manual mapping.
+
+**Final results:** the Facebook Ads data in BigQuery is used in two ways:
 
 - **Dashboard**: tracking ad performance every day, along the whole funnel.
 - **Ad hoc analysis**: quick questions, answered straight from the data.
 
-### 1. Build a dashboard
+### 1. Dashboard
 
 For regular monitoring of every ad. The questions it answers:
 
