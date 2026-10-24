@@ -4,7 +4,7 @@ Which metrics to read depends on the **objective** the campaign was set up with.
 
 > **Columns vs metrics:** the [Data Dictionary](./data-dictionary.md) describes columns. This file describes how a number is calculated and read.
 
-**Ratios are never stored.** They are computed in Power BI as `SUM(numerator) / SUM(denominator)` over the current filter, so they stay correct at any level (ad, campaign, course, period).
+**Impressions, Reach and Frequency are taken as reported by Facebook**, not calculated. **The other ratios are not stored**: they are computed in Power BI as `SUM(numerator) / SUM(denominator)` over the current filter, so they stay correct at any level (ad, campaign, course, period).
 
 **Focus:** every ad is set up with an objective, which decides the metrics to read, so this file is grouped by objective. Most ads run for **leads**: Traffic to a landing page (LDP), with a **form fill** as the conversion. Their core funnel is Impressions → Link Clicks → Landing Page Views → Leads. Awareness and Engagement (messages) ads run in a smaller share.
 
@@ -19,8 +19,8 @@ Goal: brand / product recognition.
 | Metric | Formula | Availability |
 |---|---|---|
 | **Reach** | People who saw the ad (each person counted once) | ✅ ⚠️ Not additive across days |
-| **Impressions** | `SUM(impressions)`. Roughly Reach × Frequency | ✅ |
-| **Frequency** | Impressions / Reach. 2 means each person saw the ad twice on average | ✅ |
+| **Impressions** | As reported by Facebook, summed over the period. Roughly Reach × Frequency | ✅ |
+| **Frequency** | As reported by Facebook: the average number of times a person saw the ad. 2 means each person saw the ad twice on average | ✅ |
 | **CPM** | `SUM(spend) / SUM(impressions) × 1000`. Main cost metric for Awareness | ✅ |
 
 **Reach pitfall.** Reach is de-duplicated per day. Summing it over days counts the same person several times. Use the daily value, or ask Facebook for the reach of the whole period.
