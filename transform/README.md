@@ -2,17 +2,21 @@
 
 Dataform builds **5 staging views → 5 mart tables** on top of the raw Airbyte tables.
 
-```text
-declarations (raw)         staging (views)             marts (tables)
-──────────────────         ───────────────             ──────────────
-campaigns       ─────────► stg_campaigns   ──┬───────► dim_campaigns
-ad_sets         ─────────► stg_ad_sets     ──┼───────► dim_ad_sets
-ads             ─────────► stg_ads         ──┤
-ad_creatives    ─────────► stg_ad_creatives┴─┬───────► dim_ads ◄── dim_ad_course_mapping
-ads_insights    ─────────► stg_ads_insights ─┴───────► fact_ad_performance
+```mermaid
+flowchart LR
+  campaigns --> stg_campaigns --> dim_campaigns
+  ad_sets --> stg_ad_sets --> dim_ad_sets
+  ads --> stg_ads --> dim_ads
+  ad_creatives --> stg_ad_creatives --> dim_ads
+  ads_insights --> stg_ads_insights --> fact_ad_performance
+  dim_ad_course_mapping --> dim_ads
 ```
 
-`dim_campaigns` takes `account_name` from `stg_ads_insights`, and `dim_ads` takes its base list of ads from it, because the campaign API does not return the account name and only ads with data matter.
+The diagram shows the main path of each table. Three tables also read another staging view:
+
+- `dim_campaigns` takes `account_name` from `stg_ads_insights`, because the campaign API does not return the account name.
+- `dim_ad_sets` reads `stg_campaigns` for the budget (with a CBO campaign, the budget sits on the campaign).
+- `dim_ads` takes its base list of ads from `stg_ads_insights`, because only ads with data matter.
 
 ## Staging
 
