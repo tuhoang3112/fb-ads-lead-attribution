@@ -81,4 +81,3 @@ Star schema at **ad** grain: `fact_ad_performance` joins to `dim_ads`, which joi
 | `ad_key` | Text the ad name is compared with |
 | `campaign_pattern` | Campaign name, used only by `campaign_ad` rules |
 | `course_selected` | Standard course name returned |
-

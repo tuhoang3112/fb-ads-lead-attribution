@@ -44,3 +44,14 @@ See the [data dictionary](../docs/data-dictionary.md).
 
 - **From 2026:** the course is read from the prefix of the ad name (`<course code>_<ad name>`, e.g. `DI_<ad name>` → the course coded `DI`).
 - **Before 2026:** ad names are free text, so a mapping table, kept by hand in a Google Sheet, pairs each course with its ad names.
+
+Sample of `dim_ad_course_mapping` (course and ad names are fictional). The `prefix` rows cover ads named from 2026; the other rows map older ads with free-text names:
+
+| mapping_type | ad_key | campaign_pattern | course_selected |
+|---|---|---|---|
+| prefix | `DI` | *null* | Course B - Foundation |
+| prefix | `SQL` | *null* | Course F - Short course |
+| prefix | `MCI` | *null* | Course F - Short course |
+| exact | `ROI` | *null* | Course A - Foundation |
+| contains | `3 questions every executive` | *null* | Course E - Specialist |
+| campaign_ad | `New Engagement Ad` | `Python - Engage - Forecast analysis - 10092024` | Course F - Short course |

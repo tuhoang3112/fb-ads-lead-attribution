@@ -106,7 +106,7 @@ flowchart TD
 | `dim_campaigns` | 1 row per campaign | Objective, status, account name |
 | `dim_ad_course_mapping` | 1 row per mapping rule | Maps ad names to a standard course name. Needed because only ads named from 2026 carry a course prefix (`<course code>_<ad name>`); older names are free text. Maintained by hand ([details](#why-a-course-mapping-table)) |
 
-Relationships in the mart (key columns only). The lead side is added in the Power BI model, through the UTM columns of `dim_ads`:
+The **Power BI data model** (key columns only). Tables come from three places:
 
 ```mermaid
 erDiagram
@@ -114,6 +114,9 @@ erDiagram
   dim_ad_sets ||--o{ dim_ads : "has"
   dim_ads ||--o{ fact_ad_performance : "daily metrics"
   dim_ad_course_mapping }o..o{ dim_ads : "course by ad name rules"
+  dim_ads ||--o{ fact_deal : "utm_tracking (1 UTM = 1 ad)"
+  dim_date ||--o{ fact_ad_performance : "date"
+  dim_date ||--o{ fact_deal : "created date"
 
   dim_campaigns {
     string campaign_id PK
@@ -136,6 +139,7 @@ erDiagram
     string ad_cta_link
     string ad_utm_campaign
     string ad_utm_content
+    string utm_tracking "custom column"
     string course_name
   }
   fact_ad_performance {
@@ -153,24 +157,33 @@ erDiagram
     string campaign_pattern
     string course_selected
   }
+  fact_deal {
+    string deal_id PK
+    timestamp created_at
+    string deal_status
+    numeric deal_value
+    string course_selected
+    string utm_source
+    string utm_medium
+    string utm_product
+    string utm_content
+    string utm_tracking "custom column"
+  }
+  dim_date {
+    date date PK
+    string month_year
+  }
 ```
+
+- **From the data mart:** `dim_campaigns`, `dim_ad_sets`, `dim_ads`, `fact_ad_performance`, `dim_ad_course_mapping`
+- **From the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse):** `fact_deal`, the lead table, taken as it is. It is joined to the ads through one column, `utm_tracking`: the UTM columns combined into a single custom column, built in Power BI on both `dim_ads` and `fact_deal`
+- **Created in Power BI:** `dim_date` (DAX)
 
 → [Data Dictionary](docs/data-dictionary.md) · [Metric Definitions](docs/metric-definitions.md)
 
 ### Why a course mapping table?
 
-From the beginning of 2026, the course of an ad is read from the **prefix of its name**: an ad named `<course code>_<ad name>` belongs to that course. For example, `DI_<ad name>` belongs to the course coded `DI`. Before that, ad names were free text, so the course cannot be read from the name. For those ads, a mapping table kept by hand in a Google Sheet pairs each course with its ad names. `dim_ad_course_mapping` brings both together.
-
-Sample of the table (course and ad names are fictional). The `prefix` rows cover ads named from 2026; the other rows map older ads with free-text names:
-
-| mapping_type | ad_key | campaign_pattern | course_selected |
-|---|---|---|---|
-| prefix | `DI` | *null* | Course B - Foundation |
-| prefix | `SQL` | *null* | Course F - Short course |
-| prefix | `MCI` | *null* | Course F - Short course |
-| exact | `ROI` | *null* | Course A - Foundation |
-| contains | `3 questions every executive` | *null* | Course E - Specialist |
-| campaign_ad | `New Engagement Ad` | `Python - Engage - Forecast analysis - 10092024` | Course F - Short course |
+From 2026, the course is read from the prefix of the ad name (`<course code>_<ad name>`). Older ads have free-text names, so a mapping table kept by hand in a Google Sheet pairs each course with its ad names. `dim_ad_course_mapping` brings both together.
 
 ---
 
