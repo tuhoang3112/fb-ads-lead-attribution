@@ -27,12 +27,13 @@ Goal: brand / product recognition.
 
 Goal: start a conversation so Sales can advise and close by chat.
 
+> **Out of scope for now:** messaging metrics are not extracted into the data mart.
+
 | Metric | Formula | Availability |
 |---|---|---|
-| **Messaging Conversations Started** | Conversations started from the ad | ❌ Not extracted yet |
-| **CPCM** | `SUM(spend) / Messaging Conversations Started` | ❌ |
+| **Messaging Conversations Started** | Conversations started from the ad | ➖ Out of scope |
+| **CPCM** | `SUM(spend) / Messaging Conversations Started` | ➖ Out of scope |
 
-Not covered yet: conversations that Sales actually advised or closed.
 
 ## 3. Traffic
 

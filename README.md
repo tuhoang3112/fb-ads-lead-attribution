@@ -110,7 +110,7 @@ fb-ads-lead-attribution/
 ## Roadmap
 
 - [ ] Join `dim_ads` UTM with CRM leads: leads and lead value per ad (the next blog post)
-- [ ] Add link clicks and messaging conversations to `fact_ad_performance`
+- [ ] Add link clicks to `fact_ad_performance` (already in staging as `inline_link_clicks`)
 - [ ] Demo data generator (random data, same tables) so the dashboard can be shared
 - [ ] Publish the Power BI dashboard (GitHub Pages, like the CRM project)
 - [ ] Sales objective: conversions, conversion rate, CPA, ROAS (Pixel events not set up yet)
