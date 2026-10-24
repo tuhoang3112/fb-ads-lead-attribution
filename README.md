@@ -47,7 +47,18 @@ Each ad is read with the metrics of its own objective → [Metric Definitions](d
 
 ### 2. Ad hoc analysis
 
-For a quick question that the dashboard does not answer yet, query the mart directly in BigQuery instead of exporting files. Example: how did a course perform in a given month, which ads spend money without a UTM, which ads still have no course. Ready-to-run queries: [`analysis/adhoc.sql`](analysis/adhoc.sql).
+For a quick question the dashboard does not answer yet, an AI agent queries the BigQuery marts, aggregates the numbers and writes the commentary, instead of exporting files and analysing them by hand.
+
+The report is a monthly view by **portfolio, course and ad**:
+
+- **Spend, Reach, Clicks, CTR, LDP View** come from the ads mart.
+- **Lead, MQL, Won** come from the [CRM mart](https://github.com/tuhoang3112/crm-data-warehouse), matched to ads through UTM.
+- **CPL** is calculated per lead, per MQL and per won.
+- The commentary reads two things: **lead volume and quality** (MQL rate) and **closing ability** (Won / MQL). It uses tiers and flags small samples, so a 100% rate on 2 leads is not read as a result.
+
+→ [analysis/sample-ad-report.xlsx](analysis/sample-ad-report.xlsx): same structure as the real report, with **demo data (randomly generated)**.
+
+A **portfolio** (AI, Data, EE, MKT) is a group of courses. It is not stored in the mart: it is derived from the course name, as a custom column in Power BI, and used to filter.
 
 ---
 
@@ -214,7 +225,7 @@ fb-ads-lead-attribution/
 ├── ingestion/        # Airbyte source setup, permissions, rate limits
 ├── transform/        # Dataform: declarations, staging, marts
 ├── orchestration/    # daily schedule
-├── analysis/         # ad hoc SQL on the mart
+├── analysis/         # ad hoc analysis: sample report (demo data)
 └── docs/
     ├── metric-definitions.md   # metrics per campaign objective
     ├── data-dictionary.md      # column definitions

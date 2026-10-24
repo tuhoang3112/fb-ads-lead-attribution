@@ -40,7 +40,7 @@ Star schema at **ad** grain: `fact_ad_performance` joins to `dim_ads`, which joi
 | `ad_cta_link` | Landing page link | Recovered through fallbacks, see [Data Quality](./data-quality.md) |
 | `ad_utm_source`, `ad_utm_medium`, `ad_utm_campaign`, `ad_utm_content` | UTM of the link | NULL when the link is missing or has no UTM |
 | `ad_copy_text` | Caption text | |
-| `course_name` | Standard course name from `dim_ad_course_mapping` | NULL when no mapping rule matches |
+| `course_name` | Standard course name from `dim_ad_course_mapping` | NULL when no mapping rule matches. The portfolio (AI, Data, EE, MKT) is derived from it in Power BI, it is not a column of the mart |
 
 ## `dim_ad_sets`
 
