@@ -8,7 +8,7 @@
 
 ## The problem
 
-The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), and the conversion is a **form fill on the landing page**. Facebook never sees that lead. Leads land in the CRM with a UTM tag but no link to a specific ad.
+The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), and the conversion is a **form fill on the landing page**. The Pixel can report the form-fill event to Facebook, but only the CRM holds the lead itself: who it is, which course, its value and whether it was won. Leads land in the CRM with a UTM tag but no link to a specific ad.
 
 - The existing dashboard showed only daily impressions, reach and spend. Totals per campaign still required opening Ads Manager.
 - Nothing connected **an ad to the leads it produced**, so "which ad creates the most leads, for which course?" had no answer.
@@ -107,7 +107,8 @@ fb-ads-lead-attribution/
 - [ ] Add the Power BI model (in progress): ads ↔ CRM leads through UTM, bridge tables, lead measures
 - [ ] Demo data generator (random data, same tables) so the dashboard can be shared
 - [ ] Publish the Power BI dashboard (GitHub Pages, like the CRM project)
-- [ ] Lead rate and CPL per ad as Power BI measures. Facebook Pixel / ROAS is not used: the conversion is a form fill counted in the CRM
+- [ ] Lead rate and CPL per ad as Power BI measures, from CRM leads matched through UTM
+- [ ] Pixel conversions (form-fill event) in the fact table, to compare with CRM leads
 
 ## Related
 

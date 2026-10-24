@@ -49,9 +49,16 @@ Goal: send people to a landing page, whatever they do next.
 | **Landing Page Views** | People who actually reached the page | ✅ |
 | **LPV rate** | Landing Page Views / Link Clicks. Separates real clicks from "ghost" clicks (user left before the page loaded) | ✅ |
 
-## 4. Conversion = form fill (measured in the CRM)
+## 4. Conversion = form fill
 
-The conversion happens on the landing page, so it is counted from **CRM leads matched to ads through UTM in Power BI** (section 5), not from a Facebook Pixel event. The Facebook Sales objective (Pixel, `Conversions`, ROAS) is not used. If it is set up later, these are the definitions:
+The conversion happens on the landing page and can be counted two ways:
+
+| Source | What it gives | Availability |
+|---|---|---|
+| **Facebook Pixel** event (the event set on the ad set, see `dim_ad_sets.pixel_custom_event`) | Conversions as Facebook counts them, per ad per day | ❌ Not in `fact_ad_performance` yet |
+| **CRM leads** matched to ads through UTM in Power BI (section 5) | The real lead: course, value, won / lost | ✅ via Power BI |
+
+The two numbers can differ (attribution window, tracking loss), so compare them rather than assume they match. Definitions for the Pixel side:
 
 | Metric | Formula |
 |---|---|
