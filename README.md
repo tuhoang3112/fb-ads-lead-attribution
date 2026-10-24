@@ -41,15 +41,23 @@ For regular monitoring of every ad. The questions it answers:
 - Amount spend by account, by objective (Awareness, Traffic, Engagement, Conversion), and by course and objective
 - Table by course: amount spent, number of ads, LDP views, leads from ads, lead value
 
+![Ads Overview](docs/images/dashboard-overview.png)
+
 **Page 2: Ads Detail.** Drill-down to each ad.
 
 - Top Clicked Ads (CTR against impressions) and Top Converted Ads (leads and CPL)
 - Table per ad: ID, name, ad preview link, course, objective, start and end date, duration in days, amount spent, impressions, reach, frequency
 
+![Ads Detail](docs/images/dashboard-ads-detail.png)
+
 **Page 3: CPL Report.** Which ads produced leads, and what a lead costs.
 
 - Cost per lead by course and month: amount spent, **leads from ads** (`utm_medium = cpc`) and their CPL, **total leads** (all UTM) and their CPL
 - Ads that produced leads: UTM → ad name → number of leads by course
+
+![CPL Report](docs/images/dashboard-cpl-report.png)
+
+*Screenshots of the dashboard on data from a past period. Ad IDs, ad names, links, UTM, course names, account names and dates are hidden.*
 
 Each ad is read with the metrics of its own objective → [Metric Definitions](docs/metric-definitions.md).
 
@@ -250,4 +258,4 @@ The structure and logic come from the real pipeline. In this public copy:
 
 - The GCP project ID is a placeholder (`your-project-id`).
 - Course names, ad names and campaign names in [`dim_ad_course_mapping`](transform/definitions/marts/dim_ad_course_mapping.sqlx) are **fictional**; the matching rules (prefix / exact / contains / campaign + ad) are unchanged.
-- No ad account IDs, tokens, customer records or spend values are included.
+- No ad account IDs, tokens or customer records are included. The dashboard screenshots show aggregated figures from a past period; everything that identifies an ad, a course, an account or a date is hidden.
