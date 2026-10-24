@@ -194,30 +194,8 @@ The course of an ad is read from the **prefix of its name**: an ad named `DI_<ad
 
 ### Transformation & data quality
 
-Dataform builds **5 staging views → 5 mart tables**. The hard part is the CTA link: out of 555 creatives, 287 had no link in the official fields. A caption-regex fallback cut the creatives without UTM from 208 to 140, and only **2 ads from 2026** (the ones with real data) remained without a usable UTM.
-→ [docs/data-quality.md](docs/data-quality.md) · [transform/README.md](transform/README.md)
-
-How the CTA link and UTM are recovered:
-
-```mermaid
-flowchart TD
-  L1["1. link_url"] --> L2["2. object_story_spec<br/>link_data.link"]
-  L2 --> L3["3. object_story_spec<br/>video CTA link"]
-  L3 --> L4["4. carousel<br/>first child link"]
-  L4 --> L5["5. first URL typed<br/>in the caption (regex)"]
-  L5 --> CTA["cta_link"]
-  CTA --> UTM["UTM read from<br/>url_tags, then link_url,<br/>then the link in the caption"]
-```
-
-How many creatives were still missing a UTM:
-
-```mermaid
-flowchart LR
-  A["208<br/>creatives without UTM<br/>(before the caption fallback)"] --> B["140<br/>still without UTM<br/>(after the fallback)"]
-  B --> C["20<br/>of them have<br/>delivery data"]
-  C --> D["2<br/>belong to 2026"]
-```
-
+Dataform builds **5 staging views → 5 mart tables**. The hardest part is recovering each ad's landing-page link and UTM from the Facebook creatives, because for many ads the link is only typed in the caption. After the fallbacks, only **2 ads from 2026** are left without a usable UTM.
+→ [docs/data-quality.md](docs/data-quality.md) (how the link and UTM are recovered) · [transform/README.md](transform/README.md)
 
 ### Orchestration
 
