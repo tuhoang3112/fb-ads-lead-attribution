@@ -104,10 +104,9 @@ flowchart TD
 | `dim_ads` | 1 row per ad | CTA link, UTM, ad type, post link, **course name** |
 | `dim_ad_sets` | 1 row per ad set | Effective budget (CBO / ABO) and flattened targeting |
 | `dim_campaigns` | 1 row per campaign | Objective, status, account name |
-| `dim_date` | 1 row per day | Calendar: year, quarter, month, day of week. Shared by ad performance and leads |
 | `dim_ad_course_mapping` | 1 row per mapping rule | Maps ad names to a standard course name. Needed because only ads named from 2026 carry a course prefix (`<course code>_<ad name>`); older names are free text. Maintained by hand ([details](#why-a-course-mapping-table)) |
 
-Relationships in the data model (key columns only). `fact_deal` is the lead table, taken as it is from the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse), and `dim_date` is a calendar table of the mart. In the Power BI model, `fact_deal` is joined to the mart through the UTM columns of `dim_ads`:
+The **Power BI data model** (key columns only). Tables come from three places:
 
 ```mermaid
 erDiagram
@@ -173,6 +172,10 @@ erDiagram
     string month_year
   }
 ```
+
+- **From the data mart:** `dim_campaigns`, `dim_ad_sets`, `dim_ads`, `fact_ad_performance`, `dim_ad_course_mapping`
+- **From the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse):** `fact_deal`, the lead table, taken as it is. It is joined to the ads through the UTM columns of `dim_ads`
+- **Created in Power BI:** `dim_date` (DAX)
 
 → [Data Dictionary](docs/data-dictionary.md) · [Metric Definitions](docs/metric-definitions.md)
 

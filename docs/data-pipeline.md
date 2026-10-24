@@ -31,7 +31,7 @@ How the data gets from Facebook into the dashboard.
 
 ## Transformation & data quality
 
-Dataform builds **5 staging views → 6 mart tables**. The hardest part is recovering each ad's landing-page link and UTM from the Facebook creatives, because for many ads the link is only typed in the caption. After the fallbacks, only **2 ads from 2026** are left without a usable UTM.
+Dataform builds **5 staging views → 5 mart tables**. The hardest part is recovering each ad's landing-page link and UTM from the Facebook creatives, because for many ads the link is only typed in the caption. After the fallbacks, only **2 ads from 2026** are left without a usable UTM.
 → [docs/data-quality.md](data-quality.md) (how the link and UTM are recovered) · [transform/README.md](../transform/README.md)
 
 ## Orchestration

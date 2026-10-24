@@ -1,6 +1,6 @@
 # Data Dictionary
 
-Star schema at **ad** grain: `fact_ad_performance` joins to `dim_ads`, which joins to `dim_ad_sets` and `dim_campaigns`.
+Star schema at **ad** grain: `fact_ad_performance` joins to `dim_ads`, which joins to `dim_ad_sets` and `dim_campaigns`. `dim_date` is created in Power BI (DAX).
 
 > **Columns vs metrics:** this file describes columns. How metrics are calculated is in [Metric Definitions](./metric-definitions.md).
 >
@@ -81,17 +81,3 @@ Star schema at **ad** grain: `fact_ad_performance` joins to `dim_ads`, which joi
 | `ad_key` | Text the ad name is compared with |
 | `campaign_pattern` | Campaign name, used only by `campaign_ad` rules |
 | `course_selected` | Standard course name returned |
-
-## `dim_date`
-
-**Grain:** one row per day (2025-01-01 to 2030-12-31)
-
-| Field | Definition |
-|---|---|
-| `date` | The day |
-| `year`, `quarter`, `month` | Calendar parts |
-| `quarter_year` | Quarter label, e.g. `2026-Q3` |
-| `month_name` | Month name, e.g. `July` |
-| `month_year` | Month label, e.g. `2026-07` |
-| `day_of_week` | 1 = Sunday … 7 = Saturday |
-| `day_name` | Day name, e.g. `Monday` |
