@@ -113,7 +113,6 @@ erDiagram
   dim_campaigns ||--o{ dim_ad_sets : "has"
   dim_ad_sets ||--o{ dim_ads : "has"
   dim_ads ||--o{ fact_ad_performance : "daily metrics"
-  dim_ad_course_mapping }o..o{ dim_ads : "course by ad name rules"
   dim_ads ||--o{ fact_deal : "utm_tracking (1 UTM = 1 ad)"
   dim_date ||--o{ fact_ad_performance : "date"
   dim_date ||--o{ fact_deal : "created date"
@@ -151,12 +150,6 @@ erDiagram
     int inline_link_clicks
     numeric landing_page_views
   }
-  dim_ad_course_mapping {
-    string mapping_type
-    string ad_key
-    string campaign_pattern
-    string course_selected
-  }
   fact_deal {
     string deal_id PK
     timestamp created_at
@@ -175,7 +168,7 @@ erDiagram
   }
 ```
 
-- **From the data mart:** `dim_campaigns`, `dim_ad_sets`, `dim_ads`, `fact_ad_performance`, `dim_ad_course_mapping`
+- **From the data mart:** `dim_campaigns`, `dim_ad_sets`, `dim_ads`, `fact_ad_performance`
 - **From the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse):** `fact_deal`, the lead table, taken as it is. It is joined to the ads through one column, `utm_tracking`: the UTM columns combined into a single custom column, built in Power BI on both `dim_ads` and `fact_deal`
 - **Created in Power BI:** `dim_date` (DAX)
 
