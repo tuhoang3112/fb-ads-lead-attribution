@@ -165,12 +165,12 @@ Sample of the table (course and ad names are fictional). The `prefix` rows cover
 
 | mapping_type | ad_key | campaign_pattern | course_selected |
 |---|---|---|---|
-| prefix | `DI` | *null* | Digital Foundation Course |
-| prefix | `SQL` | *null* | SQL Basics Course |
-| prefix | `MCI` | *null* | Career Interview Prep |
-| exact | `ROI` | *null* | Dashboard Design Fundamentals |
-| contains | `3 questions every executive` | *null* | Executive Program A |
-| campaign_ad | `New Engagement Ad` | `Python - Engage - Forecast analysis - 10092024` | Python Basics Course |
+| prefix | `DI` | *null* | Course B - Foundation |
+| prefix | `SQL` | *null* | Course F - Short course |
+| prefix | `MCI` | *null* | Course F - Short course |
+| exact | `ROI` | *null* | Course A - Foundation |
+| contains | `3 questions every executive` | *null* | Course E - Specialist |
+| campaign_ad | `New Engagement Ad` | `Python - Engage - Forecast analysis - 10092024` | Course F - Short course |
 
 ---
 
