@@ -6,7 +6,7 @@ Which metrics to read depends on the **objective** the campaign was set up with.
 
 **Ratios are never stored.** They are computed in Power BI as `SUM(numerator) / SUM(denominator)` over the current filter, so they stay correct at any level (ad, campaign, course, period).
 
-**Focus:** the company runs ads as **Traffic to a landing page (LDP)**, and the conversion is a **form fill on the LDP**. The core funnel is Impressions → Link Clicks → Landing Page Views → Leads. Awareness metrics are kept as supporting metrics; Engagement (messages) is out of scope.
+**Focus:** every ad is set up with an objective, which decides the metrics to read, so this file is grouped by objective. Most ads run for **leads**: Traffic to a landing page (LDP), with a **form fill** as the conversion. Their core funnel is Impressions → Link Clicks → Landing Page Views → Leads. Awareness ads are a smaller share, and Engagement (messages) is out of scope.
 
 **Availability** shows what `fact_ad_performance` holds today. *Staging only* means the metric exists in `stg_ads_insights` but not in the fact table.
 
@@ -49,9 +49,16 @@ Goal: send people to a landing page, whatever they do next.
 | **Landing Page Views** | People who actually reached the page | ✅ |
 | **LPV rate** | Landing Page Views / Link Clicks. Separates real clicks from "ghost" clicks (user left before the page loaded) | ✅ |
 
-## 4. Conversion = form fill (measured in the CRM)
+## 4. Conversion = form fill
 
-The conversion happens on the landing page, so it is counted from **CRM leads matched to ads through UTM in Power BI** (section 5), not from a Facebook Pixel event. The Facebook Sales objective (Pixel, `Conversions`, ROAS) is not used. If it is set up later, these are the definitions:
+The conversion happens on the landing page and can be counted two ways:
+
+| Source | What it gives | Availability |
+|---|---|---|
+| **Facebook Pixel** event (the event set on the ad set, see `dim_ad_sets.pixel_custom_event`) | Conversions as Facebook counts them, per ad per day | ❌ Not in `fact_ad_performance` yet |
+| **CRM leads** matched to ads through UTM in Power BI (section 5) | The real lead: course, value, won / lost | ✅ via Power BI |
+
+The two numbers can differ (attribution window, tracking loss), so compare them rather than assume they match. Definitions for the Pixel side:
 
 | Metric | Formula |
 |---|---|
@@ -68,7 +75,8 @@ Leads come from the CRM and are matched to ads **in the Power BI model** through
 
 | Metric | Formula |
 |---|---|
-| **Leads** | CRM leads matched to the ad through UTM |
+| **Leads (from ads)** | CRM leads with `utm_medium = cpc`, matched to the ad through UTM |
+| **Total leads** | All CRM leads in the period, whatever the UTM. Used to compare with the leads from ads |
 | **Lead rate** | Leads / Landing Page Views (how well the landing page converts) |
 | **CPL** | `SUM(spend) / Leads` |
 | **Lead Value** | Deal value of those leads |

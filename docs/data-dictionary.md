@@ -32,7 +32,7 @@ Star schema at **ad** grain: `fact_ad_performance` joins to `dim_ads`, which joi
 |---|---|---|
 | `ad_id` | Ad | Should be unique and non-null |
 | `ad_set_id` | Ad set | FK to `dim_ad_sets.ad_set_id` |
-| `ad_name` | Ad name | Names start with a course code, which drives the course mapping |
+| `ad_name` | Ad name | Since early 2026 names start with a course code (`DI_<ad name>`), which drives the course mapping. Older ads have free-text names |
 | `ad_status` | Ad status | |
 | `ad_type` | Creative object type (link, video, photo, status...) | |
 | `ad_link` | Link to the Facebook post (`facebook.com/<page>/posts/<post>`) | NULL when the creative has no story ID |
@@ -40,7 +40,7 @@ Star schema at **ad** grain: `fact_ad_performance` joins to `dim_ads`, which joi
 | `ad_cta_link` | Landing page link | Recovered through fallbacks, see [Data Quality](./data-quality.md) |
 | `ad_utm_source`, `ad_utm_medium`, `ad_utm_campaign`, `ad_utm_content` | UTM of the link | NULL when the link is missing or has no UTM |
 | `ad_copy_text` | Caption text | |
-| `course_name` | Standard course name from `dim_ad_course_mapping` | NULL when no mapping rule matches |
+| `course_name` | Standard course name from `dim_ad_course_mapping` | NULL when no mapping rule matches. The portfolio (AI, Data, EE, MKT) is derived from it in Power BI, it is not a column of the mart |
 
 ## `dim_ad_sets`
 

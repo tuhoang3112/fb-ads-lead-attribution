@@ -54,4 +54,5 @@ These come from reading the models, so check them on the real data before relyin
 | Ad sets without a campaign | `dim_ad_sets` uses an inner `JOIN` to campaigns | Ad sets whose campaign is missing disappear | Compare row counts with `stg_ad_sets` |
 | Short prefix codes | Prefix rule `DA` also matches names starting with `DA…` | A different course could be mapped | Review `course_name` for new ad names |
 | Multiple `actions` rows of one type | `landing_page_views` uses a scalar subquery | Query error if one type appears twice in an array | Watch the first run after a schema change |
+| Two ads sharing one UTM | The matching rule is **1 UTM = 1 ad** | Leads of that UTM cannot be assigned to one ad | `SELECT ad_utm_campaign, ad_utm_content, COUNT(*) FROM dm_facebook_ads.dim_ads WHERE ad_utm_content IS NOT NULL GROUP BY 1, 2 HAVING COUNT(*) > 1` |
 | Shortened links | Caption links like `bit.ly` | UTM unreadable | Ask for full links with UTM |

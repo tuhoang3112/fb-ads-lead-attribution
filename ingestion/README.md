@@ -6,7 +6,7 @@ One source lands in BigQuery: the Facebook Marketing API, through Airbyte.
 |---|---|---|
 | **Facebook Marketing** (Graph API) | Airbyte built-in *Facebook Marketing* source, self-hosted | BigQuery dataset `dw_facebook_ads` (raw) |
 
-No custom connector is needed: the built-in source already offers every stream used here. Airbyte runs on the same VM as the CRM project, so no new infrastructure was set up.
+No custom connector is needed: the built-in source already offers every stream used here. Airbyte runs on the same VM as the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse), so no new infrastructure was set up.
 
 ## 1. Access token
 
