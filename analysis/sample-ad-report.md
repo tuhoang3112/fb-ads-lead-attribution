@@ -6,70 +6,69 @@
 - CPL = Spend / Lead, CPL MQL = Spend / MQL, CPL Won = Spend / Won (blank when the count is 0).
 - 2026-09 is a partial month.
 
-## Commentary by portfolio (demo data, 2026-07 to 2026-09, September is partial)
+## Commentary by portfolio (demo data, July-September 2026, September is a partial month)
 
-*Tiers: MQL rate Good >= 70%, Medium 60-70%, Low < 60%. Won/MQL Strong >= 40%, Average 15-40%, Weak < 15%. Fewer than 10 leads = small sample.*
+*Tiers: MQL rate Good >= 70%, Medium 60-70%, Low < 60%. Won/MQL Strong >= 40%, Average 20-40%, Weak < 20%. Fewer than 10 leads (or MQLs) = small sample.*
 
-## Section 1: Lead volume and quality (Volume + MQL rate)
+## Section 1: Lead volume + quality (Volume + MQL rate)
 
-### Overview
+Overview of the 3 portfolios (July-September):
 
 | Portfolio | Lead | MQL | MQL rate |
 |---|---|---|---|
-| Advanced | 58 | 49 | 84.5% (Good) |
+| Advanced | 58 | 49 | 84.5% (Good, highest) |
 | Foundation | 48 | 35 | 72.9% (Good) |
-| Specialist | 15 | 10 | 66.7% (Medium) |
+| Specialist | 15 | 10 | 66.7% (Medium, lowest) |
 
-**Advanced**: 58 leads in total. MQL rate by month: 78.3% (Good) -> 87.1% (Good) -> 100.0% (Good)
+### Advanced — largest volume, quality improving month after month
 
-- Course D - Advanced: 27 leads, MQL 85.2% (Good)
-- Combo: Course A + Course C: 21 leads, MQL 85.7% (Good)
-- Course C - Advanced: 10 leads, MQL 80.0% (Good)
+MQL rate rises every month: 78.3% (Good) → 87.1% (Good) → 100% (Good) — the only portfolio that improves quality month after month (September is a small sample).
 
-**Foundation**: 48 leads in total. MQL rate by month: 77.8% (Good) -> 57.1% (Low) -> 85.7% (Good)
+- Course D - Advanced: 27 leads, MQL 85.2% — Good — biggest volume in Advanced, and quality is good.
+- Combo: Course A + Course C: 21 leads, MQL 85.7% — Good — best MQL rate of all courses with enough volume.
+- Course C - Advanced: 10 leads, MQL 80% — Good.
 
-- Course A - Foundation: 23 leads, MQL 69.6% (Medium)
-- Course B - Foundation: 17 leads, MQL 64.7% (Medium)
-- Course F - Short course: 8 leads, MQL 100.0% (Good) - small sample, read with care
+### Foundation — mid-sized volume, quality stays around the middle
 
-**Specialist**: 15 leads in total. MQL rate by month: 70.0% (Good) -> 50.0% (Low) -> 100.0% (Good)
+MQL rate moves up and down: 77.8% (Good) → 57.1% (Low) → 85.7% (Good) (September is a small sample).
 
-- Course E - Specialist: 9 leads, MQL 66.7% (Medium) - small sample, read with care
-- Program G - Professional: 6 leads, MQL 66.7% (Medium) - small sample, read with care
+- Course A - Foundation: 23 leads, MQL 69.6% — Medium — biggest volume in Foundation, but quality is only medium.
+- Course B - Foundation: 17 leads, MQL 64.7% — Medium — lowest MQL rate of all courses with enough volume.
+- Course F - Short course: 8 leads, MQL 100% — Good — only 8 leads, the sample is too small.
+
+### Specialist — smallest volume, lowest quality of the portfolios, read conclusions with care
+
+MQL rate moves up and down: 70% (Good) → 50% (Low) → 100% (Good) (September is a small sample).
+
+- Course E - Specialist: 9 leads, MQL 66.7% — Medium — only 9 leads, the sample is too small.
+- Program G - Professional: 6 leads, MQL 66.7% — Medium — only 6 leads, the sample is too small.
 
 ## Section 2: Closing ability (Won / MQL)
 
-### Overview
+Overview of the 3 portfolios (July-September):
 
 | Portfolio | MQL | Won | Won/MQL |
 |---|---|---|---|
-| Advanced | 49 | 22 | 44.9% (Strong) |
+| Advanced | 49 | 22 | 44.9% (Strong, highest) |
 | Foundation | 35 | 5 | 14.3% (Weak) |
-| Specialist | 10 | 0 | 0.0% (Weak) |
+| Specialist | 10 | 0 | 0% (Weak, lowest) |
 
-**Advanced**
+### Advanced — closes best of the 3 portfolios
 
-- Course D - Advanced: 23 MQL -> 10 won (43.5%, Strong)
-- Combo: Course A + Course C: 18 MQL -> 8 won (44.4%, Strong)
-- Course C - Advanced: 8 MQL -> 4 won (50.0%, Strong) - small sample
+- Course C - Advanced: 8 MQL → 4 won (50%) — strong — small sample.
+- Combo: Course A + Course C: 18 MQL → 8 won (44.4%) — strong — best closing of all courses with enough volume.
+- Course D - Advanced: 23 MQL → 10 won (43.5%) — strong.
 
-**Foundation**
+### Foundation — average closing
 
-- Course A - Foundation: 16 MQL -> 1 won (6.2%, Weak)
-- Course B - Foundation: 11 MQL -> 2 won (18.2%, Average)
-- Course F - Short course: 8 MQL -> 2 won (25.0%, Average) - small sample
+- Course F - Short course: 8 MQL → 2 won (25%) — average — small sample.
+- Course B - Foundation: 11 MQL → 2 won (18.2%) — weak.
+- Course A - Foundation: 16 MQL → 1 won (6.2%) — weak — worst closing of all courses with enough volume.
 
-**Specialist**
+### Specialist — weakest closing, almost no lead from ads is won
 
-- Course E - Specialist: 6 MQL -> 0 won (0.0%, Weak) - small sample
-- Program G - Professional: 4 MQL -> 0 won (0.0%, Weak) - small sample
-
-### Biggest leak in absolute numbers (MQLs that did not close)
-
-- Course A - Foundation (Foundation): 16 MQL, only 1 won (6.2%), 15 MQLs lost
-- Course D - Advanced (Advanced): 23 MQL, only 10 won (43.5%), 13 MQLs lost
-- Combo: Course A + Course C (Advanced): 18 MQL, only 8 won (44.4%), 10 MQLs lost
-
+- Course E - Specialist: 6 MQL → 0 won (0%) — weak — small sample.
+- Program G - Professional: 4 MQL → 0 won (0%) — weak — small sample.
 ## Portfolio by month
 
 | Portfolio | Month | Spend (VND) | Lead | MQL | Won | CPL (VND) | CPL MQL (VND) | CPL Won (VND) |
