@@ -9,7 +9,7 @@ How the data gets from Facebook into the dashboard.
 | Stream | What it holds |
 |---|---|
 | `campaigns` | Objective, budget, status |
-| `ad_sets` | Targeting, budget, promoted pixel / event |
+| `ad_sets` | Targeting, budget |
 | `ads` | Ad name, status, link to the creative |
 | `ad_creatives` | Caption, CTA link, `url_tags`, `object_story_spec` |
 | `ads_insights` | Daily performance per ad (spend, impressions, reach, clicks, `actions`) |

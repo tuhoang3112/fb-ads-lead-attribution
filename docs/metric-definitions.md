@@ -49,21 +49,7 @@ Goal: send people to a landing page, whatever they do next.
 
 ## 4. Conversion = form fill
 
-The conversion happens on the landing page and can be counted two ways:
-
-| Source | What it gives |
-|---|---|
-| **Facebook Pixel** event (the event set on the ad set, see `dim_ad_sets.pixel_custom_event`) | Conversions as Facebook counts them, per ad per day. Not in `fact_ad_performance` yet |
-| **CRM leads** matched to ads through UTM in Power BI (section 5) | The real lead: course, value, won / lost. Counted in Power BI |
-
-The two numbers can differ (attribution window, tracking loss), so compare them rather than assume they match. Definitions for the Pixel side:
-
-| Metric | Formula |
-|---|---|
-| **Conversions** | Number of conversion events |
-| **Conversion Rate** | Conversions / Landing Page Views |
-| **CPA** | `SUM(spend) / Conversions` |
-| **ROAS** | Revenue / `SUM(spend)` |
+The conversion happens on the landing page: the visitor fills the registration form. It is counted from **CRM leads matched to ads through UTM in Power BI** (section 5).
 
 ---
 

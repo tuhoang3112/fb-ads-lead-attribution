@@ -28,7 +28,7 @@ Facebook Marketing exposes many streams. Only five are synced:
 | Stream | Used for |
 |---|---|
 | `campaigns` | `dim_campaigns`: objective, budget level |
-| `ad_sets` | `dim_ad_sets`: targeting, budget, pixel |
+| `ad_sets` | `dim_ad_sets`: targeting, budget |
 | `ads` | `dim_ads`: ad name, status, creative ID |
 | `ad_creatives` | `dim_ads`: CTA link and UTM (see [data quality](../docs/data-quality.md)) |
 | `ads_insights` | `fact_ad_performance`: daily metrics per ad |
