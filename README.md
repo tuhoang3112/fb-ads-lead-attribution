@@ -183,7 +183,7 @@ fb-ads-lead-attribution/
     ├── metric-definitions.md   # metrics per campaign objective
     ├── data-dictionary.md      # column definitions
     ├── data-pipeline.md        # sources, architecture decisions, transformation, orchestration
-    └── data-quality.md         # CTA link / UTM recovery, coverage, known gaps
+    └── data-quality.md         # CTA link / UTM recovery, coverage, course mapping
 ```
 
 ## Related

@@ -42,17 +42,3 @@ The 2 remaining ads: one has no link in its caption, one uses a shortened link, 
 ## 4. Course mapping
 
 Each ad gets a `course_name` from `dim_ad_course_mapping`. Rules are checked in this priority: `campaign_ad` > `exact` > `contains` > `prefix`, and longer keys win inside a type. An ad matching nothing gets `course_name = NULL`: add a rule when a new naming pattern appears.
-
-## 5. Things to watch (not verified on production data)
-
-These come from reading the models, so check them on the real data before relying on them.
-
-| Risk | Where | Effect | Check |
-|---|---|---|---|
-| Ad renamed over time | `dim_ads` builds its base list with `SELECT DISTINCT ad_id, ad_set_id, ad_name, campaign_name` from insights | One `ad_id` can appear twice, which breaks the one-to-many join from `dim_ads` to the fact | `SELECT ad_id, COUNT(*) FROM dm_facebook_ads.dim_ads GROUP BY 1 HAVING COUNT(*) > 1` |
-| Duplicate raw rows | Staging views do not de-duplicate by latest `_airbyte_extracted_at` | Duplicate rows in the fact if the Airbyte sync mode appends | `SELECT ad_id, date_start, COUNT(*) FROM dm_facebook_ads.fact_ad_performance GROUP BY 1, 2 HAVING COUNT(*) > 1` |
-| Ad sets without a campaign | `dim_ad_sets` uses an inner `JOIN` to campaigns | Ad sets whose campaign is missing disappear | Compare row counts with `stg_ad_sets` |
-| Short prefix codes | Prefix rule `DA` also matches names starting with `DA…` | A different course could be mapped | Review `course_name` for new ad names |
-| Multiple `actions` rows of one type | `landing_page_views` uses a scalar subquery | Query error if one type appears twice in an array | Watch the first run after a schema change |
-| Two ads sharing one UTM | The matching rule is **1 UTM = 1 ad** | Leads of that UTM cannot be assigned to one ad | `SELECT ad_utm_campaign, ad_utm_content, COUNT(*) FROM dm_facebook_ads.dim_ads WHERE ad_utm_content IS NOT NULL GROUP BY 1, 2 HAVING COUNT(*) > 1` |
-| Shortened links | Caption links like `bit.ly` | UTM unreadable | Ask for full links with UTM |
