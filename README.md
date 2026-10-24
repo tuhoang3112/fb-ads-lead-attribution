@@ -12,7 +12,7 @@
 
 The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), and the conversion is a **form fill on the landing page**. The Pixel can report the form-fill event to Facebook, but only the CRM holds the lead itself: who it is, which course, its value and whether it was won. Leads land in the CRM with a UTM tag but no link to a specific ad.
 
-- Reporting showed only daily impressions, reach and spend. Campaign totals and the key metrics of each objective still required opening Ads Manager.
+- There was no proper dashboard. To see how ads performed, the team had to open Ads Manager, or download the data and analyse it by hand.
 - Nothing connected **an ad to the leads it produced**, so "which ad creates the most leads, for which course?" had no answer.
 - To judge an ad by the leads it brings, the team had to build a report by hand and count leads one by one, which took a lot of time.
 
