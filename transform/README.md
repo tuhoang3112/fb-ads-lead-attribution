@@ -52,15 +52,3 @@ The course of an ad is read from the prefix of its name (`DI_<ad name>` → the 
 | `prefix` | Ad name starts with the code (e.g. `DA - …`), with or without a leading quote |
 
 A new ad that matches no rule gets `course_name = NULL`. Add a row to the mapping.
-
-## Before the first run
-
-- `workflow_settings.yaml` and `declarations/*.sqlx`: replace `your-project-id` with your GCP project.
-- Raw tables are expected in dataset `dw_facebook_ads` (the Airbyte destination).
-
-## Local check
-
-```bash
-cd transform
-npx @dataform/cli@3.0.52 compile
-```
