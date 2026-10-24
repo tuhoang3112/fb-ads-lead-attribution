@@ -7,7 +7,7 @@ Built in two rounds, each documented in a blog post:
 1. [How I rebuilt the Facebook Ads dashboard for the Marketing team](https://zoedatalens.substack.com/p/rebuild-facebook-ads-dashboard): metrics per campaign objective, manual exports, a hand-made UTM mapping table.
 2. [Facebook Ads data system](https://zoedatalens.substack.com/p/facebook-ads-data-system): the automated pipeline, including the API route that removes the manual UTM mapping.
 
-> **Status:** ingestion → staging → data mart are built (this repo). Matching with CRM leads is the next step (see [Roadmap](#roadmap)). Demo data and the live dashboard come later.
+> **Status:** ingestion → staging → data mart are built (this repo). Matching ads with CRM leads happens in the Power BI model, which is not part of this repository yet. Demo data and the live dashboard come later (see [Roadmap](#roadmap)).
 
 ---
 
@@ -23,7 +23,7 @@ The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), an
 
 ---
 
-## How an ad will be matched to a lead
+## How an ad is matched to a lead
 
 ```text
 Ad creative                                CRM
@@ -35,7 +35,7 @@ CTA link  https://…/program?                Lead form on the landing page
   utm_content=launching_post
 ```
 
-`dim_ads` already exposes `ad_utm_source / medium / campaign / content` and `ad_cta_link`. The pipeline's hard part is making those columns reliable → [docs/data-quality.md](docs/data-quality.md).
+`dim_ads` exposes `ad_utm_source / medium / campaign / content` and `ad_cta_link`. **The join itself is done in Power BI**, between `dim_ads` and the lead counts per UTM per day from the CRM. Because one UTM can map to several ads (and the reverse), bridge tables are used in the Power BI model to avoid many-to-many relationships (see [blog 1](https://zoedatalens.substack.com/p/rebuild-facebook-ads-dashboard)). The pipeline's hard part is making the UTM columns reliable → [docs/data-quality.md](docs/data-quality.md).
 
 ---
 
@@ -109,14 +109,14 @@ fb-ads-lead-attribution/
 
 ## Roadmap
 
-- [ ] Join `dim_ads` UTM with CRM leads: leads and lead value per ad (the next blog post)
+- [ ] Document the Power BI model: ads ↔ CRM leads through UTM, bridge tables, lead measures (the next blog post)
 - [ ] Demo data generator (random data, same tables) so the dashboard can be shared
 - [ ] Publish the Power BI dashboard (GitHub Pages, like the CRM project)
-- [ ] Lead rate and CPL per ad (needs the CRM join). Facebook Pixel / ROAS is not used: the conversion is a form fill counted in the CRM
+- [ ] Lead rate and CPL per ad as Power BI measures. Facebook Pixel / ROAS is not used: the conversion is a form fill counted in the CRM
 
 ## Related
 
-- [crm-data-warehouse](https://github.com/tuhoang3112/crm-data-warehouse): the CRM side. Leads will come from its `fact_deal`.
+- [crm-data-warehouse](https://github.com/tuhoang3112/crm-data-warehouse): the CRM side. Leads come from its `fact_deal` (UTM columns).
 
 ## Data privacy
 

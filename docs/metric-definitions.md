@@ -51,7 +51,7 @@ Goal: send people to a landing page, whatever they do next.
 
 ## 4. Conversion = form fill (measured in the CRM)
 
-The conversion happens on the landing page, so it is counted from **CRM leads matched through UTM** (section 5), not from a Facebook Pixel event. The Facebook Sales objective (Pixel, `Conversions`, ROAS) is not used. If it is set up later, these are the definitions:
+The conversion happens on the landing page, so it is counted from **CRM leads matched to ads through UTM in Power BI** (section 5), not from a Facebook Pixel event. The Facebook Sales objective (Pixel, `Conversions`, ROAS) is not used. If it is set up later, these are the definitions:
 
 | Metric | Formula |
 |---|---|
@@ -62,9 +62,9 @@ The conversion happens on the landing page, so it is counted from **CRM leads ma
 
 ---
 
-## 5. Lead metrics (planned: ad → CRM)
+## 5. Lead metrics (ad → CRM, in Power BI)
 
-Needs the CRM join on UTM (see the Roadmap in the README).
+Leads come from the CRM and are matched to ads **in the Power BI model** through UTM (`dim_ads.ad_utm_*`). These measures are defined in Power BI, not in Dataform.
 
 | Metric | Formula |
 |---|---|

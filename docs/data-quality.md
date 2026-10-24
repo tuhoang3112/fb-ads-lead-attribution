@@ -1,6 +1,6 @@
 # Data Quality: CTA Link, UTM and Course Mapping
 
-Matching ads to leads is only as good as the **CTA link of each ad**. This page records how the link is recovered, the coverage reached, and what to watch.
+Matching ads to leads (done in Power BI) is only as good as the **CTA link of each ad**. This page records how the link is recovered, the coverage reached, and what to watch.
 
 ## 1. Recovering `cta_link`
 
