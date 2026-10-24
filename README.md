@@ -2,11 +2,6 @@
 
 > An end-to-end data system (**Airbyte → BigQuery → Dataform → Power BI**) that pulls Facebook Ads data every day, flattens the nested API fields, recovers each ad's landing-page link and **UTM**, and labels each ad with its course. The UTM is the key that lets ads be matched to CRM leads.
 
-Built in two rounds, each documented in a blog post:
-
-1. [How I rebuilt the Facebook Ads dashboard for the Marketing team](https://zoedatalens.substack.com/p/rebuild-facebook-ads-dashboard): metrics per campaign objective, manual exports, a hand-made UTM mapping table.
-2. [Facebook Ads data system](https://zoedatalens.substack.com/p/facebook-ads-data-system): the automated pipeline, including the API route that removes the manual UTM mapping.
-
 > **Status:** ingestion → staging → data mart are built (this repo). Matching ads with CRM leads happens in the Power BI model, which is not part of this repository yet. Demo data and the live dashboard come later (see [Roadmap](#roadmap)).
 
 ---
@@ -15,9 +10,9 @@ Built in two rounds, each documented in a blog post:
 
 The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), and the conversion is a **form fill on the landing page**. Facebook never sees that lead. Leads land in the CRM with a UTM tag but no link to a specific ad.
 
-- The first dashboard showed only daily impressions, reach and spend. Totals per campaign still required opening Ads Manager.
+- The existing dashboard showed only daily impressions, reach and spend. Totals per campaign still required opening Ads Manager.
 - Nothing connected **an ad to the leads it produced**, so "which ad creates the most leads, for which course?" had no answer.
-- In round one the link between an ad and its UTM was a **hand-maintained Google Sheet**, because the database did not hold each ad's CTA link.
+- The database did not hold each ad's CTA link, so the link between an ad and its UTM would have to be a **hand-maintained Google Sheet**.
 
 **Goal:** daily, automatic ad performance **per campaign objective**, with every ad carrying its **CTA link, UTM and course**, so ads can be joined to CRM leads without manual mapping.
 
@@ -35,7 +30,7 @@ CTA link  https://…/program?                Lead form on the landing page
   utm_content=launching_post
 ```
 
-`dim_ads` exposes `ad_utm_source / medium / campaign / content` and `ad_cta_link`. **The join itself is done in Power BI**, between `dim_ads` and the lead counts per UTM per day from the CRM. Because one UTM can map to several ads (and the reverse), bridge tables are used in the Power BI model to avoid many-to-many relationships (see [blog 1](https://zoedatalens.substack.com/p/rebuild-facebook-ads-dashboard)). The pipeline's hard part is making the UTM columns reliable → [docs/data-quality.md](docs/data-quality.md).
+`dim_ads` exposes `ad_utm_source / medium / campaign / content` and `ad_cta_link`. **The join itself is done in Power BI**, between `dim_ads` and the lead counts per UTM per day from the CRM. Because one UTM can map to several ads (and the reverse), bridge tables are used in the Power BI model to avoid many-to-many relationships. The pipeline's hard part is making the UTM columns reliable → [docs/data-quality.md](docs/data-quality.md).
 
 ---
 
@@ -109,7 +104,7 @@ fb-ads-lead-attribution/
 
 ## Roadmap
 
-- [ ] Document the Power BI model: ads ↔ CRM leads through UTM, bridge tables, lead measures (the next blog post)
+- [ ] Document the Power BI model: ads ↔ CRM leads through UTM, bridge tables, lead measures
 - [ ] Demo data generator (random data, same tables) so the dashboard can be shared
 - [ ] Publish the Power BI dashboard (GitHub Pages, like the CRM project)
 - [ ] Lead rate and CPL per ad as Power BI measures. Facebook Pixel / ROAS is not used: the conversion is a form fill counted in the CRM
