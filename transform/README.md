@@ -38,6 +38,8 @@ See the [data dictionary](../docs/data-dictionary.md).
 
 ## Course mapping rules
 
+The course of an ad is read from the prefix of its name (`DI_<ad name>` → the course coded `DI`). That naming rule only applies from the beginning of 2026; older ads have free-text names, so this table also maps them by exact name, phrase or campaign + ad name.
+
 | Type | Matches when |
 |---|---|
 | `campaign_ad` | Ad name **and** campaign name both equal the rule (for generic ad names reused across campaigns) |
