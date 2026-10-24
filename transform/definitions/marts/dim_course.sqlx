@@ -1,0 +1,11 @@
+config {
+  type: "table",
+  schema: "dm_facebook_ads",
+  description: "Dimension: courses (products). Maintained by hand in a Google Sheet",
+  assertions: { uniqueKey: ["course_code"], nonNull: ["course_code"] }
+}
+
+SELECT
+  UPPER(TRIM(course_code)) AS course_code,
+  course_name
+FROM ${ref("course")}

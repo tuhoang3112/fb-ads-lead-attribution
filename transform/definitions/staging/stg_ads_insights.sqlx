@@ -1,0 +1,29 @@
+config {
+  type: "view",
+  schema: "dm_facebook_ads_view",
+  description: "Staging: daily ad insights - one row per ad per day, nested `actions` flattened into columns"
+}
+
+js {
+  const { actionValue } = require("includes/fb");
+}
+
+SELECT
+  ad_id,
+  adset_id AS ad_set_id,
+  campaign_id,
+  account_id,
+  account_name,
+  SAFE_CAST(date_start AS DATE) AS report_date,
+  objective,
+  SAFE_CAST(spend AS FLOAT64) AS spend,
+  SAFE_CAST(impressions AS INT64) AS impressions,
+  SAFE_CAST(reach AS INT64) AS reach,
+  SAFE_CAST(clicks AS INT64) AS clicks_all,
+  -- Link clicks: the dedicated field first, the `link_click` action as fallback
+  COALESCE(SAFE_CAST(inline_link_clicks AS INT64), CAST(${actionValue(["link_click"])} AS INT64)) AS link_clicks,
+  CAST(${actionValue(["landing_page_view"])} AS INT64) AS landing_page_views,
+  -- Check the exact action_type in your own account (the suffix is the attribution window)
+  CAST(${actionValue(["onsite_conversion.messaging_conversation_started_7d"])} AS INT64) AS messaging_conversations_started
+FROM ${ref("ads_insights")}
+QUALIFY ROW_NUMBER() OVER (PARTITION BY ad_id, date_start ORDER BY _airbyte_extracted_at DESC) = 1

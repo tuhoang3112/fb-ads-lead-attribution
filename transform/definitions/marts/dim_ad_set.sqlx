@@ -1,0 +1,31 @@
+config {
+  type: "table",
+  schema: "dm_facebook_ads",
+  description: "Dimension: ad sets with targeting and the budget that actually applies",
+  assertions: { uniqueKey: ["ad_set_id"], nonNull: ["ad_set_id", "campaign_id"] }
+}
+
+SELECT
+  s.ad_set_id,
+  s.campaign_id,
+  s.account_id,
+  s.ad_set_name,
+  s.optimization_goal,
+  s.billing_event,
+  s.status,
+  s.effective_status,
+  c.budget_type,
+  -- The budget that applies depends on where it is set:
+  -- CBO -> campaign level, ABO -> ad set level
+  IF(c.budget_type = 'CBO', c.daily_budget, s.daily_budget) AS applied_daily_budget,
+  IF(c.budget_type = 'CBO', c.lifetime_budget, s.lifetime_budget) AS applied_lifetime_budget,
+  s.start_time,
+  s.end_time,
+  s.targeting_age_range,
+  s.targeting_locations,
+  s.targeting_display_positions,
+  s.targeting_devices,
+  s.targeting_interests,
+  s.targeting_custom_audiences
+FROM ${ref("stg_ad_set")} s
+LEFT JOIN ${ref("stg_campaign")} c USING (campaign_id)

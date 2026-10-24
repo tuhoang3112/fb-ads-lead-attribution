@@ -1,0 +1,29 @@
+config {
+  type: "view",
+  schema: "dm_facebook_ads_view",
+  description: "Staging: campaigns - latest version per ID, typed, budget level detected (CBO vs ABO)"
+}
+
+SELECT
+  id AS campaign_id,
+  account_id,
+  name AS campaign_name,
+  objective,
+  buying_type,
+  status,
+  effective_status,
+  -- Budgets come in the account currency's smallest unit (VND has no minor unit, so no /100).
+  -- 0 / NULL means "no budget set at this level".
+  NULLIF(SAFE_CAST(daily_budget AS INT64), 0) AS daily_budget,
+  NULLIF(SAFE_CAST(lifetime_budget AS INT64), 0) AS lifetime_budget,
+  -- CBO = budget lives on the campaign. ABO = budget lives on each ad set.
+  IF(
+    NULLIF(SAFE_CAST(daily_budget AS INT64), 0) IS NOT NULL
+      OR NULLIF(SAFE_CAST(lifetime_budget AS INT64), 0) IS NOT NULL,
+    'CBO', 'ABO'
+  ) AS budget_type,
+  SAFE_CAST(start_time AS TIMESTAMP) AS start_time,
+  SAFE_CAST(stop_time AS TIMESTAMP) AS stop_time,
+  SAFE_CAST(created_time AS TIMESTAMP) AS created_time
+FROM ${ref("campaigns")}
+QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY _airbyte_extracted_at DESC) = 1

@@ -1,0 +1,60 @@
+config {
+  type: "view",
+  schema: "dm_facebook_ads_view",
+  description: "Staging: ad sets - flattens the nested `targeting` JSON into readable strings"
+}
+
+-- `targeting` is a nested JSON object. Every list is flattened to one string,
+-- never "first element only" (that silently drops data).
+SELECT
+  id AS ad_set_id,
+  campaign_id,
+  account_id,
+  name AS ad_set_name,
+  optimization_goal,
+  billing_event,
+  status,
+  effective_status,
+  NULLIF(SAFE_CAST(daily_budget AS INT64), 0) AS daily_budget,
+  NULLIF(SAFE_CAST(lifetime_budget AS INT64), 0) AS lifetime_budget,
+  SAFE_CAST(start_time AS TIMESTAMP) AS start_time,
+  SAFE_CAST(end_time AS TIMESTAMP) AS end_time,
+
+  -- Age range: prefer the real `age_range`, fall back to age_min-age_max
+  COALESCE(
+    NULLIF(ARRAY_TO_STRING(JSON_VALUE_ARRAY(targeting, '$.age_range'), '-'), ''),
+    CONCAT(JSON_VALUE(targeting, '$.age_min'), '-', JSON_VALUE(targeting, '$.age_max'))
+  ) AS targeting_age_range,
+
+  -- Locations: countries + regions + cities
+  NULLIF(ARRAY_TO_STRING(ARRAY_CONCAT(
+    JSON_VALUE_ARRAY(targeting, '$.geo_locations.countries'),
+    ARRAY(SELECT JSON_VALUE(r, '$.name') FROM UNNEST(JSON_QUERY_ARRAY(targeting, '$.geo_locations.regions')) AS r),
+    ARRAY(SELECT JSON_VALUE(c, '$.name') FROM UNNEST(JSON_QUERY_ARRAY(targeting, '$.geo_locations.cities')) AS c)
+  ), ', '), '') AS targeting_locations,
+
+  -- Placements: Facebook + Instagram positions merged into one string
+  NULLIF(ARRAY_TO_STRING(ARRAY_CONCAT(
+    ARRAY(SELECT CONCAT('facebook:', p) FROM UNNEST(JSON_VALUE_ARRAY(targeting, '$.facebook_positions')) AS p),
+    ARRAY(SELECT CONCAT('instagram:', p) FROM UNNEST(JSON_VALUE_ARRAY(targeting, '$.instagram_positions')) AS p)
+  ), ', '), '') AS targeting_display_positions,
+
+  -- Devices: platforms (mobile / desktop) + specific user devices
+  NULLIF(ARRAY_TO_STRING(ARRAY_CONCAT(
+    JSON_VALUE_ARRAY(targeting, '$.device_platforms'),
+    JSON_VALUE_ARRAY(targeting, '$.user_device')
+  ), ', '), '') AS targeting_devices,
+
+  -- Interests live inside flexible_spec[].interests[]
+  NULLIF(ARRAY_TO_STRING(ARRAY(
+    SELECT JSON_VALUE(i, '$.name')
+    FROM UNNEST(JSON_QUERY_ARRAY(targeting, '$.flexible_spec')) AS fs,
+         UNNEST(JSON_QUERY_ARRAY(fs, '$.interests')) AS i
+  ), ', '), '') AS targeting_interests,
+
+  NULLIF(ARRAY_TO_STRING(ARRAY(
+    SELECT JSON_VALUE(ca, '$.name')
+    FROM UNNEST(JSON_QUERY_ARRAY(targeting, '$.custom_audiences')) AS ca
+  ), ', '), '') AS targeting_custom_audiences
+FROM ${ref("ad_sets")}
+QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY _airbyte_extracted_at DESC) = 1

@@ -1,0 +1,22 @@
+config {
+  type: "table",
+  schema: "dm_facebook_ads",
+  description: "Dimension: campaigns, with the objective that decides which metrics matter",
+  assertions: { uniqueKey: ["campaign_id"], nonNull: ["campaign_id"] }
+}
+
+SELECT
+  campaign_id,
+  account_id,
+  campaign_name,
+  objective,
+  buying_type,
+  status,
+  effective_status,
+  budget_type,
+  daily_budget,
+  lifetime_budget,
+  start_time,
+  stop_time,
+  created_time
+FROM ${ref("stg_campaign")}

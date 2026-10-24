@@ -1,0 +1,24 @@
+config {
+  type: "table",
+  schema: "dm_facebook_ads",
+  description: "Fact: one row per ad per day. Additive counts only - ratios (CTR, CPM, CPC...) are computed in the BI layer",
+  bigquery: { partitionBy: "report_date", clusterBy: ["ad_id"] },
+  assertions: { uniqueKey: ["ad_id", "report_date"], nonNull: ["ad_id", "report_date"] }
+}
+
+SELECT
+  ad_id,
+  ad_set_id,
+  campaign_id,
+  account_id,
+  report_date,
+  objective,
+  spend,
+  impressions,
+  -- Reach is deduplicated per day. Do NOT SUM it across days (see docs/metric-definitions.md)
+  reach,
+  clicks_all,
+  link_clicks,
+  landing_page_views,
+  messaging_conversations_started
+FROM ${ref("stg_ads_insights")}

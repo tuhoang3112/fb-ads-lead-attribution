@@ -1,0 +1,18 @@
+config {
+  type: "table",
+  schema: "dm_facebook_ads",
+  description: "Fact: leads and lead value per ad per day (weighted attribution). Same grain as fact_ad_insights_daily, so both join to dim_ad without many-to-many",
+  bigquery: { partitionBy: "report_date", clusterBy: ["ad_id"] },
+  assertions: { uniqueKey: ["ad_id", "report_date"], nonNull: ["ad_id", "report_date"] }
+}
+
+SELECT
+  a.ad_id,
+  l.lead_date AS report_date,
+  SUM(a.attribution_weight) AS leads,
+  SUM(a.attribution_weight * IFNULL(l.deal_value, 0)) AS lead_value,
+  SUM(IF(l.deal_status = 'won', a.attribution_weight, 0)) AS won_deals,
+  SUM(IF(l.deal_status = 'won', a.attribution_weight * IFNULL(l.deal_value, 0), 0)) AS won_value
+FROM ${ref("fact_lead_attribution")} a
+JOIN ${ref("fact_lead")} l USING (deal_id)
+GROUP BY a.ad_id, l.lead_date
