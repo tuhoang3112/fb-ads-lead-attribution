@@ -115,4 +115,17 @@
 
 ## Ads by month
 
-The ad-level sheet has about 300 rows. Open it in [`sample-ad-report.xlsx`](sample-ad-report.xlsx).
+Top 10 rows by spend, out of 150. The full ad-level sheet is in [`sample-ad-report.xlsx`](sample-ad-report.xlsx).
+
+| Portfolio | Course | Ad | Month | Spend (VND) | Reach | Clicks | CTR (%) | LDP View | Lead | MQL | Won | CPL (VND) | CPL MQL (VND) | CPL Won (VND) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Advanced | Course D - Advanced | CD_Why your reports are ignored | 2026-08 | 3,545,327 | 98,450 | 2,791 | 2.42 | 1,604 | 18 | 17 | 8 | 196,963 | 208,549 | 443,166 |
+| Advanced | Course C - Advanced | CC_5 mistakes in your first campaign | 2026-08 | 3,379,288 | 121,976 | 1,105 | 0.75 | 648 | 2 | 2 | 2 | 1,689,644 | 1,689,644 | 1,689,644 |
+| Advanced | Course C - Advanced | CC_5 mistakes in your first campaign | 2026-07 | 3,241,233 | 116,168 | 1,060 | 0.75 | 620 | 5 | 4 | 2 | 648,247 | 810,308 | 1,620,616 |
+| Advanced | Course D - Advanced | CD_Why your reports are ignored | 2026-07 | 2,971,094 | 66,033 | 2,339 | 2.42 | 595 | 3 | 2 | 1 | 990,365 | 1,485,547 | 2,971,094 |
+| Advanced | Course C - Advanced | CC_Stop guessing, start measuring | 2026-07 | 2,668,439 | 83,131 | 1,174 | 1 | 652 | 0 | 0 | 0 |  |  |  |
+| Foundation | Course F - Short course | CF_Why your reports are ignored | 2026-07 | 2,003,872 | 118,624 | 3,936 | 2.63 | 1,186 | 2 | 2 | 1 | 1,001,936 | 1,001,936 | 2,003,872 |
+| Advanced | Course C - Advanced | CC_Demo in 3 minutes | 2026-08 | 1,962,130 | 49,123 | 282 | 0.41 | 107 | 1 | 1 | 0 | 1,962,130 | 1,962,130 |  |
+| Foundation | Course A - Foundation | CA_5 mistakes in your first campaign | 2026-08 | 1,693,485 | 48,009 | 1,861 | 2.52 | 550 | 3 | 2 | 0 | 564,495 | 846,742 |  |
+| Advanced | Combo: Course A + Course C | AC_Stop guessing, start measuring | 2026-08 | 1,541,650 | 59,539 | 1,633 | 1.85 | 604 | 1 | 0 | 0 | 1,541,650 |  |  |
+| Advanced | Course C - Advanced | CC_Stop guessing, start measuring | 2026-08 | 1,529,861 | 43,490 | 673 | 1 | 247 | 0 | 0 | 0 |  |  |  |
