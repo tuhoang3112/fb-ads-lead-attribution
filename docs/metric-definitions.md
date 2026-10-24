@@ -6,7 +6,7 @@ Which metrics to read depends on the **objective** the campaign was set up with.
 
 **Ratios are never stored.** They are computed in Power BI as `SUM(numerator) / SUM(denominator)` over the current filter, so they stay correct at any level (ad, campaign, course, period).
 
-**Focus:** the company runs ads as **Traffic to a landing page (LDP)**, and the conversion is a **form fill on the LDP**. The core funnel is Impressions → Link Clicks → Landing Page Views → Leads. Awareness metrics are kept as supporting metrics; Engagement (messages) is out of scope.
+**Focus:** every ad is set up with an objective, which decides the metrics to read, so this file is grouped by objective. Most ads run for **leads**: Traffic to a landing page (LDP), with a **form fill** as the conversion. Their core funnel is Impressions → Link Clicks → Landing Page Views → Leads. Awareness ads are a smaller share, and Engagement (messages) is out of scope.
 
 **Availability** shows what `fact_ad_performance` holds today. *Staging only* means the metric exists in `stg_ads_insights` but not in the fact table.
 
