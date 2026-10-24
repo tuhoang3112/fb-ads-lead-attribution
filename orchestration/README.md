@@ -1,6 +1,6 @@
 # Orchestration
 
-The Facebook Ads pipeline reuses the VM and the schedule pattern of the CRM project. The VM setup is described in [Build Data Systems from Scratch #01](https://zoedatalens.substack.com/p/schedule-pipeline).
+The Facebook Ads pipeline reuses the VM and the schedule pattern of the CRM project.
 
 ## Flow
 
