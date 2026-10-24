@@ -36,19 +36,11 @@ The diagram shows the main path of each table. Three tables also read another st
 | `dim_ads` | Ad attributes + course. Course comes from `dim_ad_course_mapping` |
 | `dim_ad_sets` | Effective budget = ad set budget, else campaign budget |
 | `dim_campaigns` | Objective, status, dates, account name |
-| `dim_ad_course_mapping` | Hand-maintained rules in 4 types. Priority: `campaign_ad` > `exact` > `contains` > `prefix` (longer key first) |
+| `dim_ad_course_mapping` | Hand-maintained mapping from ad names to course names |
 
 See the [data dictionary](../docs/data-dictionary.md).
 
-## Course mapping rules
+## Course mapping
 
-The course of an ad is read from the prefix of its name (`DI_<ad name>` → the course coded `DI`). That naming rule only applies from the beginning of 2026; older ads have free-text names, so this table also maps them by exact name, phrase or campaign + ad name.
-
-| Type | Matches when |
-|---|---|
-| `campaign_ad` | Ad name **and** campaign name both equal the rule (for generic ad names reused across campaigns) |
-| `exact` | Ad name equals the rule (curly quotes are normalised) |
-| `contains` | Ad name contains the text |
-| `prefix` | Ad name starts with the code (e.g. `DA - …`), with or without a leading quote |
-
-A new ad that matches no rule gets `course_name = NULL`. Add a row to the mapping.
+- **From 2026:** the course is read from the prefix of the ad name (`DI_<ad name>` → the course coded `DI`).
+- **Before 2026:** ad names are free text, so a mapping table, kept by hand in a Google Sheet, pairs each course with its ad names.
