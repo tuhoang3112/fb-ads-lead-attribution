@@ -10,7 +10,7 @@
 
 The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), and the conversion is a **form fill on the landing page**. The Pixel can report the form-fill event to Facebook, but only the CRM holds the lead itself: who it is, which course, its value and whether it was won. Leads land in the CRM with a UTM tag but no link to a specific ad.
 
-- The existing dashboard showed only daily impressions, reach and spend. Totals per campaign still required opening Ads Manager.
+- Reporting showed only daily impressions, reach and spend. Campaign totals and the key metrics of each objective still required opening Ads Manager.
 - Nothing connected **an ad to the leads it produced**, so "which ad creates the most leads, for which course?" had no answer.
 - To judge an ad by the leads it brings, the team had to build a report by hand and count leads one by one, which took a lot of time.
 
@@ -44,7 +44,7 @@ flowchart TD
 | **ETL or ELT** | **ELT** | Facebook data arrives with nested JSON (targeting, creatives, actions). It is loaded raw and flattened in SQL, so a logic fix is re-applied to all history |
 | **Ingestion tool** | **Airbyte (self-hosted)**, built-in *Facebook Marketing* source | The source already has every stream needed. No custom connector (unlike the CRM project) |
 | **Transformation** | **Dataform** | SQLX + Git, dependency graph with `ref()`, runs inside BigQuery |
-| **BI** | **Power BI** | Same tool as the previous dashboard |
+| **BI** | **Power BI** | Reads the marts directly. Same BI tool as the CRM project |
 | **Schema** | Fact + dimensions, fact at 1 row per ad per day | Matches the grain of the Facebook insights data |
 
 ---
