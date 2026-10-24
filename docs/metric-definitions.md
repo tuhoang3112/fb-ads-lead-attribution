@@ -75,7 +75,8 @@ Leads come from the CRM and are matched to ads **in the Power BI model** through
 
 | Metric | Formula |
 |---|---|
-| **Leads** | CRM leads matched to the ad through UTM |
+| **Leads (from ads)** | CRM leads with `utm_medium = cpc`, matched to the ad through UTM |
+| **Total leads** | All CRM leads in the period, whatever the UTM. Used to compare with the leads from ads |
 | **Lead rate** | Leads / Landing Page Views (how well the landing page converts) |
 | **CPL** | `SUM(spend) / Leads` |
 | **Lead Value** | Deal value of those leads |

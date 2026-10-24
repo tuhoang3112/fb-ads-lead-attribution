@@ -31,26 +31,25 @@ For regular monitoring of every ad. The questions it answers:
 - Where does the funnel leak: impressions → link clicks → landing page views → leads?
 - Is each ad working against the objective it was set up for?
 
-**Filters on every page:** date, product group (a group of courses), objective, ad, ad account.
+**Filters:** account, objective, course, ad name, date.
 
 **Page 1: Ads Overview.** Performance by account, objective and course.
 
-- 12 KPI cards, each with its change against the previous period: Impressions, Reach, Avg. Frequency, Link Clicks, CTR, CPC, CPM, Amount Spend, LDP Views, Lead, Lead Value, CPL
-- Funnel: Impressions → Link Clicks → LDP Views → Lead, with the three rates between steps: CTR, LDP View Rate, CR (LDP → Lead)
+- 12 KPI cards, each with its change against the previous period: Impressions, Reach, Avg. Frequency, CPM, Lead, Amount Spend, Link Clicks, LDP Views, CPC, CTR (link clicks), Lead Value, CPL
+- Funnel: Impressions → Link Clicks → LDP Views → Lead, with the rate between steps. The Lead step shows **total leads (all UTM)** next to **leads from ads (`utm_medium = cpc`)**
 - Amount spend and leads over time, LDP views and leads over time
-- Amount spend by objective, by account, and by course and objective
-- Trends: Impressions vs CPM, Link Clicks vs CPC
-- Table by course: spend, number of ads, LDP views, leads
+- Amount spend by account, by objective (Awareness, Traffic, Engagement, Conversion), and by course and objective
+- Table by course: amount spent, number of ads, LDP views, leads from ads, lead value
 
 **Page 2: Ads Detail.** Drill-down to each ad.
 
-- Table per ad: ID, name, ad preview, course, objective, start and end date, duration and the metrics
-- Top Clicked Ads (CTR against impressions) and Top Converted Ads (CPL and leads)
+- Top Clicked Ads (CTR against impressions) and Top Converted Ads (leads and CPL)
+- Table per ad: ID, name, ad preview link, course, objective, start and end date, duration in days, amount spent, impressions, reach, frequency
 
 **Page 3: CPL Report.** Which ads produced leads, and what a lead costs.
 
-- List of ads that produced leads: course, leads, UTM, ad name, ad preview
-- Cost per lead by product group: spend, leads from ads against total leads, and the CPL of each
+- Cost per lead by course and month: amount spent, **leads from ads** (`utm_medium = cpc`) and their CPL, **total leads** (all UTM) and their CPL
+- Ads that produced leads: UTM → ad name → number of leads by course
 
 Each ad is read with the metrics of its own objective → [Metric Definitions](docs/metric-definitions.md).
 
@@ -76,7 +75,7 @@ A **portfolio** (AI, Data, EE, MKT) is a group of courses. It is not stored in t
 ```mermaid
 flowchart TD
   A["<b>Facebook ad</b><br/>CTA link to the landing page"]
-  U["<b>UTM in the link</b><br/>utm_source = facebook<br/>utm_medium = fanpage<br/>utm_campaign = mc16_digital_marketing<br/>utm_content = launching_post"]
+  U["<b>UTM in the link</b><br/>utm_source = facebook<br/>utm_medium = cpc<br/>utm_campaign = career_path<br/>utm_content = roadmap_post"]
   V["<b>Landing page</b><br/>visitor arrives through the link<br/>and fills the lead form"]
   L["<b>CRM</b><br/>lead stored with the same UTM"]
   A --> U
