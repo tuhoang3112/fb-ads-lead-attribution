@@ -104,7 +104,7 @@ flowchart TD
 | `dim_ads` | 1 row per ad | CTA link, UTM, ad type, post link, **course name** |
 | `dim_ad_sets` | 1 row per ad set | Effective budget (CBO / ABO) and flattened targeting |
 | `dim_campaigns` | 1 row per campaign | Objective, status, account name |
-| `dim_ad_course_mapping` | 1 row per mapping rule | Maps ad names to a standard course name. Needed because only ads named from 2026 carry a course prefix (`DI_...`); older names are free text. Maintained by hand ([details](#why-a-course-mapping-table)) |
+| `dim_ad_course_mapping` | 1 row per mapping rule | Maps ad names to a standard course name. Needed because only ads named from 2026 carry a course prefix (`<course code>_<ad name>`); older names are free text. Maintained by hand ([details](#why-a-course-mapping-table)) |
 
 Relationships in the mart (key columns only). The lead side is added in the Power BI model, through the UTM columns of `dim_ads`:
 
@@ -159,7 +159,7 @@ erDiagram
 
 ### Why a course mapping table?
 
-From the beginning of 2026, the course of an ad is read from the **prefix of its name**: an ad named `DI_<ad name>` belongs to the course coded `DI`. Before that, ad names were free text, so the course cannot be read from the name. For those ads, a mapping table kept by hand in a Google Sheet pairs each course with its ad names. `dim_ad_course_mapping` brings both together.
+From the beginning of 2026, the course of an ad is read from the **prefix of its name**: an ad named `<course code>_<ad name>` belongs to that course. For example, `DI_<ad name>` belongs to the course coded `DI`. Before that, ad names were free text, so the course cannot be read from the name. For those ads, a mapping table kept by hand in a Google Sheet pairs each course with its ad names. `dim_ad_course_mapping` brings both together.
 
 Sample of the table (course and ad names are fictional):
 

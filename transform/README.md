@@ -42,5 +42,5 @@ See the [data dictionary](../docs/data-dictionary.md).
 
 ## Course mapping
 
-- **From 2026:** the course is read from the prefix of the ad name (`DI_<ad name>` → the course coded `DI`).
+- **From 2026:** the course is read from the prefix of the ad name (`<course code>_<ad name>`, e.g. `DI_<ad name>` → the course coded `DI`).
 - **Before 2026:** ad names are free text, so a mapping table, kept by hand in a Google Sheet, pairs each course with its ad names.

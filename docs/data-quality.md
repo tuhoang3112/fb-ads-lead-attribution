@@ -41,4 +41,4 @@ The 2 remaining ads: one has no link in its caption, one uses a shortened link, 
 
 ## 4. Course mapping
 
-Each ad gets a `course_name` from `dim_ad_course_mapping`. From 2026 the course is read from the prefix of the ad name (`DI_<ad name>`). Before 2026 the ad names are free text, so a mapping table kept by hand in a Google Sheet pairs each course with its ad names. An ad that matches nothing has no course (`course_name` is empty).
+Each ad gets a `course_name` from `dim_ad_course_mapping`. From 2026 the course is read from the prefix of the ad name (`<course code>_<ad name>`, e.g. `DI_<ad name>`). Before 2026 the ad names are free text, so a mapping table kept by hand in a Google Sheet pairs each course with its ad names. An ad that matches nothing has no course (`course_name` is empty).
