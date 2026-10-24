@@ -20,17 +20,19 @@ The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), an
 
 ## How an ad is matched to a lead
 
-```text
-Ad creative                                CRM
------------                                ---
-CTA link  https://…/program?                Lead form on the landing page
-  utm_source=facebook                         stores the UTM of the link
-  utm_medium=fanpage            ──UTM──►      the visitor arrived through
-  utm_campaign=mc16_digital_marketing
-  utm_content=launching_post
+```mermaid
+flowchart TD
+  A["<b>Facebook ad</b><br/>CTA link to the landing page"]
+  U["<b>UTM in the link</b><br/>utm_source = facebook<br/>utm_medium = fanpage<br/>utm_campaign = mc16_digital_marketing<br/>utm_content = launching_post"]
+  V["<b>Landing page</b><br/>visitor arrives through the link<br/>and fills the lead form"]
+  L["<b>CRM</b><br/>lead stored with the same UTM"]
+  A --> U
+  U -->|"visitor clicks"| V
+  V --> L
+  L -. "matched on UTM in Power BI<br/>1 UTM = 1 ad" .-> A
 ```
 
-`dim_ads` exposes `ad_utm_source / medium / campaign / content` and `ad_cta_link`. **The join itself is done in Power BI**, between `dim_ads` and the lead counts per UTM per day from the CRM. Because one UTM can map to several ads (and the reverse), bridge tables are used in the Power BI model to avoid many-to-many relationships. The pipeline's hard part is making the UTM columns reliable → [docs/data-quality.md](docs/data-quality.md).
+`dim_ads` exposes `ad_utm_source / medium / campaign / content` and `ad_cta_link`. **The join itself is done in Power BI**, between `dim_ads` and the lead counts per UTM per day from the CRM. **Rule: one UTM maps to exactly one ad.** The pipeline's hard part is making the UTM columns reliable → [docs/data-quality.md](docs/data-quality.md).
 
 ---
 
@@ -104,7 +106,7 @@ fb-ads-lead-attribution/
 
 ## Roadmap
 
-- [ ] Add the Power BI model (in progress): ads ↔ CRM leads through UTM, bridge tables, lead measures
+- [ ] Add the Power BI model (in progress): ads ↔ CRM leads through UTM, lead measures
 - [ ] Demo data generator (random data, same tables) so the dashboard can be shared
 - [ ] Publish the Power BI dashboard (GitHub Pages, like the CRM project)
 - [ ] Lead rate and CPL per ad as Power BI measures, from CRM leads matched through UTM
