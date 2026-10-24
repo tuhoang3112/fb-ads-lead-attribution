@@ -21,6 +21,6 @@ Power BI        → scheduled refresh, after Dataform finishes
 | Transform | Dataform release `production` on branch `main` + scheduled workflow | BigQuery → Dataform |
 | BI refresh | Power BI Service | Power BI Service |
 
-Order matters: Dataform runs **after** the Airbyte window, and it must also run **after the CRM pipeline**, because `fact_lead` reads the CRM mart (`dm_rework_crm`).
+Order matters: Dataform runs **after** the Airbyte window, so the transform reads a fully loaded raw layer. Once ads are joined with CRM leads, this pipeline must also run **after the CRM pipeline**.
 
 > **TODO:** the exact run times for this pipeline are not written down yet. Add them once the schedule is fixed.

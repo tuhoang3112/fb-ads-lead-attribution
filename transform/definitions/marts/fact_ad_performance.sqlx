@@ -1,0 +1,18 @@
+config {
+  type: "table",
+  schema: "dm_facebook_ads",
+  description: "Fact bảng hiệu suất ads - chỉ giữ số liệu đo lường, grain 1 dòng = 1 ad + 1 ngày"
+}
+
+SELECT
+  ad_id,
+  date_start,
+  date_stop,
+  spend,
+  reach,
+  impressions,
+  frequency,
+  clicks,
+  landing_page_views
+
+FROM ${ref("stg_ads_insights")}

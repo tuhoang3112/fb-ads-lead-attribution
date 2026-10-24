@@ -1,0 +1,53 @@
+config {
+  type: "view",
+  schema: "dm_facebook_ads_view",
+  description: "Staging layer cho ads - flatten JSON fields"
+}
+
+SELECT
+  id AS ad_id,
+  campaign_id,
+  adset_id AS ad_set_id,
+  account_id,
+  name AS ad_name,
+  status,
+  effective_status,
+  bid_type,
+  bid_amount,
+  source_ad_id,
+  last_updated_by_app_id,
+  created_time,
+  updated_time,
+
+  -- adlabels: nhãn tổ chức ad, lấy nhãn đầu tiên
+  JSON_VALUE(adlabels, '$[0].id') AS adlabel_id,
+  JSON_VALUE(adlabels, '$[0].name') AS adlabel_name,
+
+  -- bid_info: mức giá thầu theo optimization goal đang chọn
+  JSON_VALUE(bid_info, '$.CPC') AS bid_info_cpc,
+  JSON_VALUE(bid_info, '$.CPM') AS bid_info_cpm,
+
+  -- creative: chỉ cần id để join sang stg_ad_creatives lấy nội dung/CTA link
+  JSON_VALUE(creative, '$.id') AS creative_id,
+
+  -- recommendations: khuyến nghị tối ưu của Facebook (nếu có), lấy khuyến nghị đầu tiên
+  JSON_VALUE(recommendations, '$[0].code') AS recommendation_code,
+  JSON_VALUE(recommendations, '$[0].message') AS recommendation_message,
+
+  -- targeting: field phổ biến nhất để phân tích audience, cùng cấu trúc geo_locations như ad_sets
+  JSON_VALUE(targeting, '$.age_min') AS targeting_age_min,
+  JSON_VALUE(targeting, '$.age_max') AS targeting_age_max,
+  JSON_VALUE(targeting, '$.geo_locations.regions[0].name') AS targeting_region,
+  JSON_VALUE(targeting, '$.geo_locations.regions[0].country') AS targeting_country,
+  JSON_VALUE(targeting, '$.custom_audiences[0].name') AS targeting_custom_audience,
+  JSON_VALUE(targeting, '$.excluded_custom_audiences[0].name') AS targeting_excluded_audience,
+
+  -- tracking_specs, conversion_specs: mảng nhiều mục tiêu tracking khác nhau (pixel/page/post)
+  -- mỗi ad có số lượng và loại tracking khác nhau -> giữ nguyên JSON, không flatten để tránh mất data
+  tracking_specs AS tracking_specs_json,
+  conversion_specs AS conversion_specs_json,
+
+  _airbyte_raw_id,
+  _airbyte_extracted_at
+
+FROM ${ref("ads")}

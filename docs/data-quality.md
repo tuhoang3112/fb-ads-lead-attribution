@@ -1,68 +1,57 @@
-# Data Quality: CTA Link, UTM and Matching
+# Data Quality: CTA Link, UTM and Course Mapping
 
-Lead attribution is only as good as the **CTA link of each ad**. This page records how the link is recovered, what coverage was reached, and where the match is still uncertain.
+Matching ads to leads is only as good as the **CTA link of each ad**. This page records how the link is recovered, the coverage reached, and what to watch.
 
 ## 1. Recovering `cta_link`
 
-Fallback order in `stg_ad_creative` (first non-empty wins):
+Fallback order in `stg_ad_creatives` (first non-empty wins):
 
-| # | Source | `cta_link_source` |
-|---|---|---|
-| 1 | `link_url` | `link_url` |
-| 2 | `object_story_spec.link_data.link` | `object_story_spec` |
-| 3 | `object_story_spec.video_data.call_to_action.value.link` | `object_story_spec` |
-| 4 | `object_story_spec.link_data.child_attached_media[0].link` | `object_story_spec` |
-| 5 | **First URL found in the caption** (regex `https?://[^\s]+`) | `caption_regex` |
+| # | Source |
+|---|---|
+| 1 | `link_url` |
+| 2 | `object_story_spec.link_data.link` |
+| 3 | `object_story_spec.video_data.call_to_action.value.link` |
+| 4 | `object_story_spec.link_data.child_attached_media[0].link` (carousel) |
+| 5 | **First URL found in the caption** (`REGEXP_EXTRACT(body, r'(https?://[^\s]+)')`) |
 
-**Why step 5 exists.** Many older posts are images or carousels, where the link cannot sit in the CTA button, so people typed it in the caption instead.
+**Why step 5 exists.** Many image / carousel / status posts cannot put a link in the CTA button, so the link is typed in the caption. This pattern continues into 2026, it is not only old ads.
 
 ## 2. Extracting UTM
 
-`utm_source`, `utm_medium`, `utm_campaign`, `utm_content` are read from `url_tags` first, then from the query string of `cta_link`. A value like `{{ad.name}}` (an unresolved dynamic macro) is ignored. Shortened links (`bit.ly`, `fb.me`...) hide the UTM and are flagged `is_short_link = TRUE`.
+For each of `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, first match wins:
+
+1. `url_tags` (Facebook already splits the tags)
+2. `link_url`
+3. The link found in the caption (step 5 above)
 
 ## 3. Coverage achieved
 
 | Check | Count |
 |---|---|
 | Creatives total | 555 |
-| No link in official fields (`object_story_spec`) | 287 |
+| No link in the official fields (`object_story_spec`) | 287 |
 | No `url_tags` | 208 |
 | No UTM **after** the caption fallback | 140 |
 | ...of which actually appear in `ads_insights` (have data) | **20 ads** |
 | ...of which belong to 2026 | **2 ads** |
 
-The 2 remaining ads: one has no link in its caption, one uses a shortened link. Both were known to have **no leads**, because they were run and monitored by hand. Work stopped here: 2 ads out of all 2026 ads is small enough that further effort would not change the analysis.
+The 2 remaining ads: one has no link in its caption, one uses a shortened link, so the UTM cannot be read. Both were known to have **no leads**, because they were run and monitored by hand. Work stopped here: 2 ads out of all 2026 ads is small enough that more effort would not change the analysis.
 
-> Re-run this check after any change in how ads are built. The figures above come from one snapshot.
+> The figures come from one snapshot. Re-run the check after any change in how ads are built.
 
-## 4. Matching leads to ads
+## 4. Course mapping
 
-A lead is attributed to an ad when:
+Each ad gets a `course_name` from `dim_ad_course_mapping`. Rules are checked in this priority: `campaign_ad` > `exact` > `contains` > `prefix`, and longer keys win inside a type. An ad matching nothing gets `course_name = NULL`: add a rule when a new naming pattern appears.
 
-1. the lead is from a **Facebook** UTM source and its medium is not an after-the-fact Sales tag (`inbox`, `zalo`), and
-2. the lead's `utm_campaign|utm_content` equals the ad's, and
-3. the ad had delivered (had impressions) on or before the lead date.
+## 5. Things to watch (not verified on production data)
 
-`utm_source` and `utm_medium` are not part of the key on purpose: Sales can edit them later, campaign and content are stable.
+These come from reading the models, so check them on the real data before relying on them.
 
-| `attribution_status` | Meaning |
-|---|---|
-| `matched` | Exactly one ad fits |
-| `ambiguous` | Several ads share the same UTM. The lead is split equally (weight 1/N) |
-| `unmatched` | Facebook UTM, but no ad with that UTM and delivery date |
-| `not_facebook_ads` | Other channels, or no usable UTM |
-
-## 5. Known gaps
-
-| Gap | Effect | Mitigation |
-|---|---|---|
-| Two ads reusing one UTM | Leads split equally, which may be wrong | Give every ad a unique `utm_content` |
-| Shortened links in captions | UTM unreadable | Use full links with UTM |
-| Lead date vs ad date | The ad may have been paused before a late lead | The rule uses first-delivery date only, so late leads still match |
-| Time zone | CRM timestamps are converted to Asia/Ho_Chi_Minh; Facebook dates follow the ad account's time zone | Make sure both are the same zone |
-
-## 6. Automatic checks (Dataform assertions)
-
-- Unique and non-null keys on every mart
-- Weights of one lead always sum to 1
-- Total leads in `fact_ad_lead_daily` equals the number of `matched` + `ambiguous` leads
+| Risk | Where | Effect | Check |
+|---|---|---|---|
+| Ad renamed over time | `dim_ads` builds its base list with `SELECT DISTINCT ad_id, ad_set_id, ad_name, campaign_name` from insights | One `ad_id` can appear twice, which breaks the one-to-many join from `dim_ads` to the fact | `SELECT ad_id, COUNT(*) FROM dm_facebook_ads.dim_ads GROUP BY 1 HAVING COUNT(*) > 1` |
+| Duplicate raw rows | Staging views do not de-duplicate by latest `_airbyte_extracted_at` | Duplicate rows in the fact if the Airbyte sync mode appends | `SELECT ad_id, date_start, COUNT(*) FROM dm_facebook_ads.fact_ad_performance GROUP BY 1, 2 HAVING COUNT(*) > 1` |
+| Ad sets without a campaign | `dim_ad_sets` uses an inner `JOIN` to campaigns | Ad sets whose campaign is missing disappear | Compare row counts with `stg_ad_sets` |
+| Short prefix codes | Prefix rule `DA` also matches names starting with `DA…` | A different course could be mapped | Review `course_name` for new ad names |
+| Multiple `actions` rows of one type | `landing_page_views` uses a scalar subquery | Query error if one type appears twice in an array | Watch the first run after a schema change |
+| Shortened links | Caption links like `bit.ly` | UTM unreadable | Ask for full links with UTM |

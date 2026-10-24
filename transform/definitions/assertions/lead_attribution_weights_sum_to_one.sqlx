@@ -1,9 +1,0 @@
-config {
-  type: "assertion",
-  description: "Every attributed lead must have weights that sum to 1, otherwise leads are double counted or lost"
-}
-
-SELECT deal_id, SUM(attribution_weight) AS total_weight
-FROM ${ref("fact_lead_attribution")}
-GROUP BY deal_id
-HAVING ABS(SUM(attribution_weight) - 1) > 0.000001

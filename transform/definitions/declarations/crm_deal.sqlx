@@ -1,6 +1,0 @@
-config {
-  type: "declaration",
-  schema: "dm_rework_crm",
-  name: "fact_deal",
-  description: "CRM mart (project crm-data-warehouse). Source of leads for attribution"
-}

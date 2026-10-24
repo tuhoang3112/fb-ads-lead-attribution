@@ -1,6 +1,0 @@
-config {
-  type: "declaration",
-  schema: "dm_rework_crm",
-  name: "dim_stage",
-  description: "CRM mart (project crm-data-warehouse). Used to keep only Sales-pipeline deals as leads"
-}

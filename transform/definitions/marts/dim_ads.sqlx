@@ -1,0 +1,83 @@
+config {
+  type: "table",
+  schema: "dm_facebook_ads",
+  description: "Dimension bảng ad - thuộc tính cố định, kèm mapping sang tên khóa học chuẩn qua dim_ad_course_mapping"
+}
+
+WITH ads_base AS (
+  SELECT
+    i.ad_id,
+    i.ad_set_id,
+    i.ad_name,
+    i.campaign_name,
+    ads.status AS ad_status,
+    cr.object_type AS ad_type,
+
+    CASE 
+      WHEN cr.page_id IS NOT NULL AND cr.post_id IS NOT NULL 
+      THEN CONCAT('https://www.facebook.com/', cr.page_id, '/posts/', cr.post_id)
+      ELSE NULL
+    END AS ad_link,
+
+    cr.cta_type AS ad_cta_type,
+    cr.cta_link AS ad_cta_link,
+    cr.utm_source AS ad_utm_source,
+    cr.utm_medium AS ad_utm_medium,
+    cr.utm_campaign AS ad_utm_campaign,
+    cr.utm_content AS ad_utm_content,
+    cr.ad_copy_text
+
+  FROM (SELECT DISTINCT ad_id, ad_set_id, ad_name, campaign_name FROM ${ref("stg_ads_insights")}) i
+  LEFT JOIN ${ref("stg_ads")} ads ON i.ad_id = ads.ad_id
+  LEFT JOIN ${ref("stg_ad_creatives")} cr ON ads.creative_id = cr.creative_id
+),
+
+matched AS (
+  SELECT
+    a.*,
+    m.course_selected,
+    m.mapping_type,
+    ROW_NUMBER() OVER (
+      PARTITION BY a.ad_id 
+      ORDER BY 
+        CASE m.mapping_type 
+          WHEN 'campaign_ad' THEN 1 
+          WHEN 'exact' THEN 2 
+          WHEN 'contains' THEN 3 
+          WHEN 'prefix' THEN 4 
+        END,
+        LENGTH(m.ad_key) DESC
+    ) AS rn
+  FROM ads_base a
+
+  LEFT JOIN ${ref("dim_ad_course_mapping")} m
+    ON (m.mapping_type = 'campaign_ad' AND a.ad_name = m.ad_key AND a.campaign_name = m.campaign_pattern)
+    OR (m.mapping_type = 'exact' AND 
+        TRANSLATE(a.ad_name, CONCAT(CODE_POINTS_TO_STRING([8220]), CODE_POINTS_TO_STRING([8221])), '""') = 
+        TRANSLATE(m.ad_key, CONCAT(CODE_POINTS_TO_STRING([8220]), CODE_POINTS_TO_STRING([8221])), '""'))
+    OR (m.mapping_type = 'contains' AND STRPOS(a.ad_name, m.ad_key) > 0)
+    OR (m.mapping_type = 'prefix' AND (
+          STARTS_WITH(a.ad_name, CONCAT("'", m.ad_key, "'"))
+          OR STARTS_WITH(a.ad_name, m.ad_key)
+          OR STARTS_WITH(a.ad_name, CONCAT("'", m.ad_key))
+        ))
+)
+
+SELECT
+  ad_id,
+  ad_set_id,
+  ad_name,
+  ad_status,
+  ad_type,
+  ad_link,
+  ad_cta_type,
+  ad_cta_link,
+  ad_utm_source,
+  ad_utm_medium,
+  ad_utm_campaign,
+  ad_utm_content,
+  ad_copy_text,
+  course_selected AS course_name
+
+FROM matched
+WHERE rn = 1

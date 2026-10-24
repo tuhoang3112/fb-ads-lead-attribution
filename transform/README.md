@@ -1,44 +1,56 @@
 # Transform (Dataform)
 
-> **Draft.** These models were written from the two blog posts and compile with the Dataform CLI (`dataform compile`), but have **not been run on BigQuery** and are meant to be aligned with the production code.
-
-Dataform builds **6 staging views → 9 mart tables**, plus 2 custom assertions and key assertions on every mart.
+Dataform builds **5 staging views → 5 mart tables** on top of the raw Airbyte tables.
 
 ```text
-declarations (raw)            staging (views)            marts (tables)
-─────────────────             ───────────────            ──────────────
-campaigns          ─────────► stg_campaign   ─────────► dim_campaign
-ad_sets            ─────────► stg_ad_set     ─────────► dim_ad_set
-ads                ─────────► stg_ad         ─┐
-ad_creatives       ─────────► stg_ad_creative ┴────────► dim_ad
-ads_insights       ─────────► stg_ads_insights ───────► fact_ad_insights_daily, dim_account
-course (Sheet)     ────────────────────────────────────► dim_course
-CRM fact_deal      ─────────► stg_lead ───────────────► fact_lead_attribution → fact_lead → fact_ad_lead_daily
-CRM dim_stage      ─────────►
+declarations (raw)         staging (views)             marts (tables)
+──────────────────         ───────────────             ──────────────
+campaigns       ─────────► stg_campaigns   ──┬───────► dim_campaigns
+ad_sets         ─────────► stg_ad_sets     ──┼───────► dim_ad_sets
+ads             ─────────► stg_ads         ──┤
+ad_creatives    ─────────► stg_ad_creatives┴─┬───────► dim_ads ◄── dim_ad_course_mapping
+ads_insights    ─────────► stg_ads_insights ─┴───────► fact_ad_performance
 ```
+
+`dim_campaigns` takes `account_name` from `stg_ads_insights`, and `dim_ads` takes its base list of ads from it, because the campaign API does not return the account name and only ads with data matter.
 
 ## Staging
 
 | Model | What it does |
 |---|---|
-| `stg_campaign` | Latest version per ID. Detects `CBO` vs `ABO` budget |
-| `stg_ad_set` | Flattens the `targeting` JSON: age range, locations, placements, devices, interests, custom audiences. **Every list is joined, never "first element only"** (an earlier version lost data this way) |
-| `stg_ad` | Latest version per ID. Extracts `creative_id` |
-| `stg_ad_creative` | Recovers `cta_link` through 5 fallbacks and extracts the UTM. See [data quality](../docs/data-quality.md) |
-| `stg_ads_insights` | One row per ad per day. Flattens the `actions` array into columns |
-| `stg_lead` | CRM leads of the Sales pipelines with a normalised UTM key |
+| `stg_campaigns` | Flattens JSON labels / issues. Infers **CBO vs ABO** (the API has no such field): budget set on the campaign → CBO, otherwise ABO |
+| `stg_ad_sets` | Opposite budget inference (budget on the ad set → ABO). Flattens `targeting`: the **real** age range (not `age_min` / `age_max`, which is a fixed ceiling with Advantage+), gender mapping, locations (regions + cities), placements, devices, interests, custom audiences. Lists are aggregated, never "first element only" |
+| `stg_ads` | Flattens labels, bid info, targeting basics. Extracts `creative_id` to join creatives. Keeps `tracking_specs` / `conversion_specs` as JSON to avoid losing data |
+| `stg_ad_creatives` | Recovers `cta_link` and UTM through fallbacks (see [data quality](../docs/data-quality.md)) |
+| `stg_ads_insights` | One row per ad per day from `2026-01-01`. Casts metrics. Pulls `landing_page_views`, `view_content` and the video milestones out of the `actions` arrays |
 
 ## Marts
 
-See the [data dictionary](../docs/data-dictionary.md). Matching rules: [data quality](../docs/data-quality.md#4-matching-leads-to-ads).
+| Model | Notes |
+|---|---|
+| `fact_ad_performance` | Measures only, grain ad × day |
+| `dim_ads` | Ad attributes + course. Course comes from `dim_ad_course_mapping` |
+| `dim_ad_sets` | Effective budget = ad set budget, else campaign budget |
+| `dim_campaigns` | Objective, status, dates, account name |
+| `dim_ad_course_mapping` | Hand-maintained rules in 4 types. Priority: `campaign_ad` > `exact` > `contains` > `prefix` (longer key first) |
 
-## Things to check before the first real run
+See the [data dictionary](../docs/data-dictionary.md).
 
-- `workflow_settings.yaml`: replace `defaultProject` and check the datasets.
-- Declarations point to the raw dataset `dw_facebook_ads` (Airbyte destination) and to the CRM mart `dm_rework_crm`.
-- The `action_type` names in `includes/fb.js` and `stg_ads_insights` (the messaging one carries an attribution-window suffix).
-- `stg_lead` assumes the CRM columns `utm_product` (campaign-level UTM), `utm_source`, `utm_medium`, `utm_content` and pipeline IDs `2042` and `2754`.
-- Time zone: leads are converted to `Asia/Ho_Chi_Minh`.
+## Course mapping rules
+
+| Type | Matches when |
+|---|---|
+| `campaign_ad` | Ad name **and** campaign name both equal the rule (for generic ad names reused across campaigns) |
+| `exact` | Ad name equals the rule (curly quotes are normalised) |
+| `contains` | Ad name contains the text |
+| `prefix` | Ad name starts with the code (e.g. `DA - …`), with or without a leading quote |
+
+A new ad that matches no rule gets `course_name = NULL`. Add a row to the mapping.
+
+## Before the first run
+
+- `workflow_settings.yaml` and `declarations/*.sqlx`: replace `your-project-id` with your GCP project.
+- Raw tables are expected in dataset `dw_facebook_ads` (the Airbyte destination).
 
 ## Local check
 

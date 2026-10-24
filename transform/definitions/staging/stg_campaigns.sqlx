@@ -1,0 +1,54 @@
+config {
+  type: "view",
+  schema: "dm_facebook_ads_view",
+  description: "Staging layer cho campaigns - flatten JSON fields, suy luận loại ngân sách CBO/ABO"
+}
+
+SELECT
+  id AS campaign_id,
+  name AS campaign_name,
+  status,
+  effective_status,
+  configured_status,
+  objective,
+  buying_type,
+  bid_strategy,
+  spend_cap,
+  daily_budget,
+  lifetime_budget,
+  budget_remaining,
+  start_time,
+  stop_time,
+  created_time,
+  updated_time,
+  account_id,
+  boosted_object_id,
+  source_campaign_id,
+  special_ad_category,
+  smart_promotion_type,
+  budget_rebalance_flag,
+
+  -- budget_type: suy luận CBO/ABO từ việc campaign có set ngân sách hay không.
+  -- Facebook không expose thẳng field này, phải suy luận qua daily_budget/lifetime_budget
+  -- có giá trị hay NULL. Nếu campaign có set -> CBO (ngân sách quản lý ở cấp campaign),
+  -- nếu NULL -> ABO (ngân sách để ở cấp ad_set, xem thêm budget_type trong stg_ad_sets)
+  CASE 
+    WHEN daily_budget IS NOT NULL OR lifetime_budget IS NOT NULL THEN 'CBO'
+    ELSE 'ABO'
+  END AS budget_type,
+
+  -- adlabels: nhãn tổ chức campaign, lấy nhãn đầu tiên
+  JSON_VALUE(adlabels, '$[0].id') AS adlabel_id,
+  JSON_VALUE(adlabels, '$[0].name') AS adlabel_name,
+
+  -- issues_info: lỗi cấu hình đang gặp (nếu có), lấy lỗi đầu tiên để biết campaign có vấn đề không
+  JSON_VALUE(issues_info, '$[0].error_message') AS issue_message,
+  JSON_VALUE(issues_info, '$[0].level') AS issue_level,
+
+  -- special_ad_category_country: quốc gia áp dụng khi campaign thuộc special ad category
+  JSON_VALUE(special_ad_category_country, '$[0]') AS special_ad_category_country,
+
+  _airbyte_raw_id,
+  _airbyte_extracted_at
+
+FROM ${ref("campaigns")}

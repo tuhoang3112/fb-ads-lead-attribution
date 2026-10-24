@@ -1,5 +1,0 @@
-config {
-  type: "declaration",
-  schema: "dw_facebook_ads",
-  name: "course"
-}

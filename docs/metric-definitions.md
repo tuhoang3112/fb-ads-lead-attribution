@@ -4,7 +4,9 @@ Which metrics to read depends on the **objective** the campaign was set up with.
 
 > **Columns vs metrics:** the [Data Dictionary](./data-dictionary.md) describes columns. This file describes how a number is calculated and read.
 
-All base counts come from `fact_ad_insights_daily` (one row per ad per day). **Ratios are never stored**: they are computed in Power BI as `SUM(numerator) / SUM(denominator)` over the selected filter, so they stay correct at any level (ad, campaign, course, period).
+**Ratios are never stored.** They are computed in Power BI as `SUM(numerator) / SUM(denominator)` over the current filter, so they stay correct at any level (ad, campaign, course, period).
+
+**Availability** shows what `fact_ad_performance` holds today. Metrics marked *staging only* exist in `stg_ads_insights` and need to be added to the fact table.
 
 ---
 
@@ -12,12 +14,12 @@ All base counts come from `fact_ad_insights_daily` (one row per ad per day). **R
 
 Goal: brand / product recognition.
 
-| Metric | Formula | Notes |
+| Metric | Formula | Availability |
 |---|---|---|
-| **Reach** | People who saw the ad (each person counted once) | ⚠️ Not additive across days (see below) |
-| **Impressions** | `SUM(impressions)` | Times the ad was shown. Roughly Reach × Frequency |
-| **Frequency** | Impressions / Reach | Average times a person saw the ad. 2 = twice on average |
-| **CPM** | `SUM(spend) / SUM(impressions) × 1000` | Cost per 1,000 impressions. Main cost metric for Awareness |
+| **Reach** | People who saw the ad (each person counted once) | ✅ ⚠️ Not additive across days |
+| **Impressions** | `SUM(impressions)`. Roughly Reach × Frequency | ✅ |
+| **Frequency** | Impressions / Reach. 2 means each person saw the ad twice on average | ✅ |
+| **CPM** | `SUM(spend) / SUM(impressions) × 1000`. Main cost metric for Awareness | ✅ |
 
 **Reach pitfall.** Reach is de-duplicated per day. Summing it over days counts the same person several times. Use the daily value, or ask Facebook for the reach of the whole period.
 
@@ -25,10 +27,10 @@ Goal: brand / product recognition.
 
 Goal: start a conversation so Sales can advise and close by chat.
 
-| Metric | Formula |
-|---|---|
-| **Messaging Conversations Started** | `SUM(messaging_conversations_started)` |
-| **CPCM** (cost per conversation) | `SUM(spend) / SUM(messaging_conversations_started)` |
+| Metric | Formula | Availability |
+|---|---|---|
+| **Messaging Conversations Started** | Conversations started from the ad | ❌ Not extracted yet |
+| **CPCM** | `SUM(spend) / Messaging Conversations Started` | ❌ |
 
 Not covered yet: conversations that Sales actually advised or closed.
 
@@ -36,13 +38,13 @@ Not covered yet: conversations that Sales actually advised or closed.
 
 Goal: send people to a landing page, whatever they do next.
 
-| Metric | Formula | Notes |
+| Metric | Formula | Availability |
 |---|---|---|
-| **Link Clicks** | `SUM(link_clicks)` | Clicks on the link in the ad |
-| **CTR** | `SUM(link_clicks) / SUM(impressions)` | Link-click CTR. `clicks_all` includes likes, comments and shares, so it gives a higher number |
-| **CPC** | `SUM(spend) / SUM(link_clicks)` | |
-| **Landing Page Views** | `SUM(landing_page_views)` | People who actually reached the page |
-| **LPV rate** | Landing Page Views / Link Clicks | Separates real clicks from "ghost" clicks (user left before the page loaded) |
+| **Link Clicks** | Clicks on the link in the ad | *staging only* (`inline_link_clicks`) |
+| **CTR** | Link Clicks / Impressions | *staging only*. `clicks` in the fact includes likes and shares, so it overstates CTR |
+| **CPC** | `SUM(spend) / Link Clicks` | *staging only* |
+| **Landing Page Views** | People who actually reached the page | ✅ |
+| **LPV rate** | Landing Page Views / Link Clicks. Separates real clicks from "ghost" clicks (user left before the page loaded) | needs Link Clicks |
 
 ## 4. Sales (not built yet)
 
@@ -57,21 +59,18 @@ Needs the Facebook Pixel and a conversion event. Listed so the definitions are a
 
 ---
 
-## 5. Lead metrics (ad → CRM)
+## 5. Lead metrics (planned: ad → CRM)
 
-**Source:** `fact_ad_lead_daily` (leads per ad per day), joined with `fact_ad_insights_daily` through `dim_ad`.
+Needs the CRM join on UTM (see the Roadmap in the README).
 
-| Metric | Formula | Notes |
-|---|---|---|
-| **Leads** | `SUM(leads)` | Can be a decimal: a lead shared by N ads counts 1/N for each |
-| **CPL** | `SUM(spend) / SUM(leads)` | |
-| **Lead Value** | `SUM(lead_value)` | Deal value of the leads |
-| **Won Deals / Won Value** | `SUM(won_deals)`, `SUM(won_value)` | Outcome reported by the CRM |
-| **Click → Lead rate** | `SUM(leads) / SUM(link_clicks)` | |
-| **Funnel** | Impressions → Link Clicks → Landing Page Views → Leads | |
+| Metric | Formula |
+|---|---|
+| **Leads** | CRM leads matched to the ad through UTM |
+| **CPL** | `SUM(spend) / Leads` |
+| **Lead Value** | Deal value of those leads |
+| **Funnel** | Impressions → Link Clicks → Landing Page Views → Leads |
 
 **Common misreadings**
 - ❌ Reading **CPL on a campaign whose objective is Awareness or Messages**. Those ads were not built to send traffic, so a high CPL says nothing about quality.
 - ❌ Adding up `reach` across days or ads.
-- ❌ Comparing leads of an ad that ran 3 days with one that ran 3 weeks. Compare per day or per currency spent.
-- ✅ Always check `fact_lead.attribution_status` before trusting a lead number: `unmatched` and `not_facebook_ads` leads are **not** in any ad's total.
+- ❌ Comparing totals of an ad that ran 3 days with one that ran 3 weeks. Compare per day or per currency spent.

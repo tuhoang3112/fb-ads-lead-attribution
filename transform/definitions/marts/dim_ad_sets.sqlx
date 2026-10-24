@@ -1,0 +1,27 @@
+config {
+  type: "table",
+  schema: "dm_facebook_ads",
+  description: "Dimension bảng ad_set - ngân sách đã gộp effective budget (CBO/ABO), targeting đã flatten"
+}
+
+SELECT
+  a.ad_set_id,
+  a.campaign_id,
+  a.ad_set_name,
+  a.effective_status AS ad_set_status,
+  a.budget_type AS budget_level,
+  COALESCE(a.daily_budget, c.daily_budget) AS daily_budget,
+  COALESCE(a.lifetime_budget, c.lifetime_budget) AS lifetime_budget,
+  a.promoted_pixel_id AS pixel,
+  a.promoted_custom_event_type AS pixel_custom_event,
+  a.targeting_age_range,
+  a.targeting_gender,
+  a.targeting_positions AS targeting_display_positions,
+  a.targeting_interests,
+  a.targeting_locations,
+  a.targeting_custom_audiences,
+  a.start_time AS ad_set_date_start,
+  a.end_time AS ad_set_date_stop
+
+FROM ${ref("stg_ad_sets")} a
+JOIN ${ref("stg_campaigns")} c USING (campaign_id)
