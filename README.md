@@ -62,7 +62,7 @@ Each ad is read with the metrics of its own objective → [Metric Definitions](d
 
 ### 2. Ad hoc analysis
 
-For a quick question the dashboard does not answer yet, an AI agent queries the BigQuery marts, aggregates the numbers and writes the commentary, instead of exporting files and analysing them by hand.
+For a quick question, when reading through the dashboard would take too long, an AI agent queries the BigQuery marts, aggregates the numbers and writes the commentary, instead of exporting files and analysing them by hand.
 
 The report is a monthly view by **portfolio, course and ad**:
 
