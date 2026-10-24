@@ -59,8 +59,3 @@ The conversion is a form fill on the landing page. Leads come from the CRM and a
 | **CPL** | `SUM(spend) / Leads` |
 | **Lead Value** | Deal value of those leads |
 | **Funnel** | Impressions → Link Clicks → Landing Page Views → Leads |
-
-**Common misreadings**
-- ❌ Reading **CPL on a campaign whose objective is Awareness or Messages**. Those ads were not built to send traffic, so a high CPL says nothing about quality.
-- ❌ Adding up `reach` across days or ads.
-- ❌ Comparing totals of an ad that ran 3 days with one that ran 3 weeks. Compare per day or per currency spent.
