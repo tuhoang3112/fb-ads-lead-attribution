@@ -1,6 +1,6 @@
 # Facebook Ads Dashboard: Which Ads Bring Leads?
 
-> A **Power BI dashboard** that shows how Facebook Ads perform against their objective and how many **leads (registrations) each ad converts**. It reads a BigQuery data mart fed daily by **Airbyte → BigQuery → Dataform**, and joins ads to CRM leads through the **UTM** in each ad's link. This is the **ads side** of the company data warehouse; the **CRM side** is [crm-data-warehouse](https://github.com/tuhoang3112/crm-data-warehouse), in the same BigQuery warehouse.
+> A **Power BI dashboard** that shows how Facebook Ads perform against their objective and how many **leads (registrations) each ad converts**. It reads a BigQuery **data mart** (clean tables, ready for analysis) fed daily by **Airbyte → BigQuery → Dataform**, and joins ads to CRM leads through the **UTM** in each ad's link. This is the **ads side** of the company data warehouse; the **CRM side** is [crm-data-warehouse](https://github.com/tuhoang3112/crm-data-warehouse), in the same BigQuery warehouse.
 
 > **Status:** the data pipeline and data mart are built (this repo). The Power BI model and the dashboard are being added to this repository step by step, with demo data so they can be shared.
 
@@ -19,7 +19,7 @@ The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), an
 
 ## Analysis
 
-The data mart feeds two kinds of analysis:
+The Facebook Ads data in BigQuery is used in two ways:
 
 - **Dashboard**: tracking ad performance every day, along the whole funnel.
 - **Ad hoc analysis**: quick questions, answered straight from the data.
@@ -65,7 +65,7 @@ Each ad is read with the metrics of its own objective → [Metric Definitions](d
 
 ### 2. Ad hoc analysis
 
-For a quick question the dashboard does not answer yet, an AI agent queries the BigQuery marts, aggregates the numbers and writes the commentary.
+For a quick question the dashboard does not answer yet, an AI agent queries the data in BigQuery, aggregates the numbers and writes the commentary.
 
 The report is a monthly view by **portfolio, course and ad**:
 
