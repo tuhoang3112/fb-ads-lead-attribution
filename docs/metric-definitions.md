@@ -47,15 +47,9 @@ Goal: send people to a landing page, whatever they do next.
 | **Landing Page Views** | People who actually reached the page |
 | **LPV rate** | Landing Page Views / Link Clicks. Separates real clicks from "ghost" clicks (user left before the page loaded) |
 
-## 4. Conversion = form fill
+## 4. Lead metrics (ad → CRM, in Power BI)
 
-The conversion happens on the landing page: the visitor fills the registration form. It is counted from **CRM leads matched to ads through UTM in Power BI** (section 5).
-
----
-
-## 5. Lead metrics (ad → CRM, in Power BI)
-
-Leads come from the CRM and are matched to ads **in the Power BI model** through UTM (`dim_ads.ad_utm_*`). These measures are defined in Power BI, not in Dataform.
+The conversion is a form fill on the landing page. Leads come from the CRM and are matched to ads **in the Power BI model** through UTM (`dim_ads.ad_utm_*`). These measures are defined in Power BI, not in Dataform.
 
 | Metric | Formula |
 |---|---|
