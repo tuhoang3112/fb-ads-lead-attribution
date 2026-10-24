@@ -161,7 +161,7 @@ erDiagram
 
 From the beginning of 2026, the course of an ad is read from the **prefix of its name**: an ad named `<course code>_<ad name>` belongs to that course. For example, `DI_<ad name>` belongs to the course coded `DI`. Before that, ad names were free text, so the course cannot be read from the name. For those ads, a mapping table kept by hand in a Google Sheet pairs each course with its ad names. `dim_ad_course_mapping` brings both together.
 
-Sample of the table (course and ad names are fictional):
+Sample of the table (course and ad names are fictional). The `prefix` rows cover ads named from 2026; the other rows map older ads with free-text names:
 
 | mapping_type | ad_key | campaign_pattern | course_selected |
 |---|---|---|---|
