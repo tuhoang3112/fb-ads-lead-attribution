@@ -12,7 +12,6 @@ The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), an
 
 - The existing dashboard showed only daily impressions, reach and spend. Totals per campaign still required opening Ads Manager.
 - Nothing connected **an ad to the leads it produced**, so "which ad creates the most leads, for which course?" had no answer.
-- The database did not hold each ad's CTA link, so the link between an ad and its UTM would have to be a **hand-maintained Google Sheet**.
 
 **Goal:** daily, automatic ad performance **per campaign objective**, with every ad carrying its **CTA link, UTM and course**, so ads can be joined to CRM leads without manual mapping.
 
