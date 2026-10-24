@@ -14,7 +14,7 @@ The company runs Facebook Ads as **traffic to landing pages** (not Lead Ads), an
 - Nothing connected **an ad to the leads it produced**, so "which ad creates the most leads, for which course?" had no answer.
 - To judge an ad by the leads it brings, the team had to build a report by hand and count leads one by one, which took a lot of time.
 
-**Goal:** daily, automatic ad performance **per campaign objective**, with every ad carrying its **CTA link, UTM and course**, so ads can be joined to CRM leads without manual mapping.
+**Goal:** measure how many **leads (registrations) each ad converts**. Daily, automatic ad performance, with every ad carrying its **CTA link, UTM and course**, so ads can be joined to CRM leads without manual mapping.
 
 ---
 
