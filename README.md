@@ -75,6 +75,55 @@ flowchart TD
 | `dim_campaigns` | 1 row per campaign | Objective, status, account name |
 | `dim_ad_course_mapping` | 1 row per mapping rule | Maps ad names to a standard course name. Maintained by hand ([why](#why-a-course-mapping-table)) |
 
+Relationships in the mart (key columns only). The lead side is added in the Power BI model, through the UTM columns of `dim_ads`:
+
+```mermaid
+erDiagram
+  dim_campaigns ||--o{ dim_ad_sets : "has"
+  dim_ad_sets ||--o{ dim_ads : "has"
+  dim_ads ||--o{ fact_ad_performance : "daily metrics"
+  dim_ad_course_mapping }o..o{ dim_ads : "course by ad name rules"
+
+  dim_campaigns {
+    string campaign_id PK
+    string account_name
+    string campaign_name
+    string campaign_objective
+    string campaign_status
+  }
+  dim_ad_sets {
+    string ad_set_id PK
+    string campaign_id FK
+    string budget_level "CBO or ABO"
+    string targeting_age_range
+    string targeting_interests
+  }
+  dim_ads {
+    string ad_id PK
+    string ad_set_id FK
+    string ad_name
+    string ad_cta_link
+    string ad_utm_campaign
+    string ad_utm_content
+    string course_name
+  }
+  fact_ad_performance {
+    string ad_id FK
+    date date_start
+    numeric spend
+    int impressions
+    int reach
+    int inline_link_clicks
+    numeric landing_page_views
+  }
+  dim_ad_course_mapping {
+    string mapping_type
+    string ad_key
+    string campaign_pattern
+    string course_selected
+  }
+```
+
 → [Data Dictionary](docs/data-dictionary.md) · [Metric Definitions](docs/metric-definitions.md)
 
 ### Why a course mapping table?
@@ -88,12 +137,41 @@ The course of an ad is read from the **prefix of its name**: an ad named `DI_<ad
 Dataform builds **5 staging views → 5 mart tables**. The hard part is the CTA link: out of 555 creatives, 287 had no link in the official fields. A caption-regex fallback cut the creatives without UTM from 208 to 140, and only **2 ads from 2026** (the ones with real data) remained without a usable UTM.
 → [docs/data-quality.md](docs/data-quality.md) · [transform/README.md](transform/README.md)
 
+How the CTA link and UTM are recovered:
+
+```mermaid
+flowchart TD
+  L1["1. link_url"] --> L2["2. object_story_spec<br/>link_data.link"]
+  L2 --> L3["3. object_story_spec<br/>video CTA link"]
+  L3 --> L4["4. carousel<br/>first child link"]
+  L4 --> L5["5. first URL typed<br/>in the caption (regex)"]
+  L5 --> CTA["cta_link"]
+  CTA --> UTM["UTM read from<br/>url_tags, then link_url,<br/>then the link in the caption"]
+```
+
+How many creatives were still missing a UTM:
+
+```mermaid
+flowchart LR
+  A["208<br/>creatives without UTM<br/>(before the caption fallback)"] --> B["140<br/>still without UTM<br/>(after the fallback)"]
+  B --> C["20<br/>of them have<br/>delivery data"]
+  C --> D["2<br/>belong to 2026"]
+```
+
 ---
 
 ## Orchestration
 
 Runs on the same VM and the same pattern as the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse): Airbyte sync → Dataform run → Power BI refresh.
 → [orchestration/README.md](orchestration/README.md)
+
+```mermaid
+flowchart LR
+  A["Start VM"] --> B["Airbyte sync<br/>Facebook → BigQuery raw"]
+  B --> C["Stop VM"]
+  B --> D["Dataform run<br/>staging → marts"]
+  D --> E["Power BI refresh"]
+```
 
 ---
 
