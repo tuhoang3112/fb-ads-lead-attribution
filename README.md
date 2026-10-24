@@ -2,6 +2,8 @@
 
 > An end-to-end data system (**Airbyte → BigQuery → Dataform → Power BI**) that pulls Facebook Ads data every day, flattens the nested API fields, recovers each ad's landing-page link and **UTM**, and labels each ad with its course. The UTM is the key that lets ads be matched to CRM leads.
 
+> This is the **ads side** of the company data warehouse. The **CRM side** is [crm-data-warehouse](https://github.com/tuhoang3112/crm-data-warehouse): the same BigQuery warehouse, so ads and leads can be joined.
+
 > **Status:** ingestion → staging → data mart are built (this repo). Matching ads with CRM leads happens in the Power BI model, which is being added to this repository step by step. Demo data and the live dashboard come with it (see [Roadmap](#roadmap)).
 
 ---
@@ -40,11 +42,11 @@ flowchart TD
 
 | Decision | Choice | Why |
 |---|---|---|
-| **Warehouse** | **BigQuery** | Same warehouse as the CRM project, so both marts can be joined |
+| **Warehouse** | **BigQuery** | Same warehouse as the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse), so both marts can be joined |
 | **ETL or ELT** | **ELT** | Facebook data arrives with nested JSON (targeting, creatives, actions). It is loaded raw and flattened in SQL, so a logic fix is re-applied to all history |
-| **Ingestion tool** | **Airbyte (self-hosted)**, built-in *Facebook Marketing* source | The source already has every stream needed. No custom connector (unlike the CRM project) |
+| **Ingestion tool** | **Airbyte (self-hosted)**, built-in *Facebook Marketing* source | The source already has every stream needed. No custom connector (unlike the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse)) |
 | **Transformation** | **Dataform** | SQLX + Git, dependency graph with `ref()`, runs inside BigQuery |
-| **BI** | **Power BI** | Reads the marts directly. Same BI tool as the CRM project |
+| **BI** | **Power BI** | Reads the marts directly. Same BI tool as the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse) |
 | **Schema** | Fact + dimensions, fact at 1 row per ad per day | Matches the grain of the Facebook insights data |
 
 ---
@@ -86,7 +88,7 @@ Dataform builds **5 staging views → 5 mart tables**. The hard part is the CTA 
 
 ## Orchestration
 
-Runs on the same VM and the same pattern as the CRM project: Airbyte sync → Dataform run → Power BI refresh.
+Runs on the same VM and the same pattern as the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse): Airbyte sync → Dataform run → Power BI refresh.
 → [orchestration/README.md](orchestration/README.md)
 
 ---
@@ -108,7 +110,7 @@ fb-ads-lead-attribution/
 
 - [ ] Add the Power BI model (in progress): ads ↔ CRM leads through UTM, lead measures
 - [ ] Demo data generator (random data, same tables) so the dashboard can be shared
-- [ ] Publish the Power BI dashboard (GitHub Pages, like the CRM project)
+- [ ] Publish the Power BI dashboard (GitHub Pages, like the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse))
 - [ ] Lead rate and CPL per ad as Power BI measures, from CRM leads matched through UTM
 - [ ] Pixel conversions (form-fill event) in the fact table, to compare with CRM leads
 
