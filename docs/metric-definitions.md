@@ -6,7 +6,7 @@ Which metrics to read depends on the **objective** the campaign was set up with.
 
 **Ratios are never stored.** They are computed in Power BI as `SUM(numerator) / SUM(denominator)` over the current filter, so they stay correct at any level (ad, campaign, course, period).
 
-**Focus:** every ad is set up with an objective, which decides the metrics to read, so this file is grouped by objective. Most ads run for **leads**: Traffic to a landing page (LDP), with a **form fill** as the conversion. Their core funnel is Impressions → Link Clicks → Landing Page Views → Leads. Awareness ads are a smaller share, and Engagement (messages) is out of scope.
+**Focus:** every ad is set up with an objective, which decides the metrics to read, so this file is grouped by objective. Most ads run for **leads**: Traffic to a landing page (LDP), with a **form fill** as the conversion. Their core funnel is Impressions → Link Clicks → Landing Page Views → Leads. Awareness and Engagement (messages) ads run in a smaller share.
 
 **Availability** shows what `fact_ad_performance` holds today. *Staging only* means the metric exists in `stg_ads_insights` but not in the fact table.
 
@@ -29,12 +29,12 @@ Goal: brand / product recognition.
 
 Goal: start a conversation so Sales can advise and close by chat.
 
-> **Out of scope for now:** messaging metrics are not extracted into the data mart.
+Ads for messages still run, in a smaller share than the lead ads. The dashboard shows both metrics: in the Ads Detail table and in the Top Messaging Started Ads chart.
 
 | Metric | Formula | Availability |
 |---|---|---|
-| **Messaging Conversations Started** | Conversations started from the ad | ➖ Out of scope |
-| **CPCM** | `SUM(spend) / Messaging Conversations Started` | ➖ Out of scope |
+| **Messaging Conversations Started** | Conversations started from the ad | In the dashboard. Not extracted into this mart yet |
+| **CPCM** | `SUM(spend) / Messaging Conversations Started` | In the dashboard. Not extracted into this mart yet |
 
 
 ## 3. Traffic
