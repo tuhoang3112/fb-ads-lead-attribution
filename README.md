@@ -4,7 +4,7 @@
 
 > This is the **ads side** of the company data warehouse. The **CRM side** is [crm-data-warehouse](https://github.com/tuhoang3112/crm-data-warehouse): the same BigQuery warehouse, so ads and leads can be joined.
 
-> **Status:** ingestion → staging → data mart are built (this repo). Matching ads with CRM leads happens in the Power BI model, which is being added to this repository step by step. Demo data and the live dashboard come with it (see [Roadmap](#roadmap)).
+> **Status:** ingestion → staging → data mart are built (this repo). Matching ads with CRM leads happens in the Power BI model, which is being added to this repository step by step. Demo data and the live dashboard come with it.
 
 ---
 
@@ -187,14 +187,6 @@ fb-ads-lead-attribution/
     ├── data-dictionary.md      # column definitions
     └── data-quality.md         # CTA link / UTM recovery, coverage, known gaps
 ```
-
-## Roadmap
-
-- [ ] Add the Power BI model (in progress): ads ↔ CRM leads through UTM, lead measures
-- [ ] Demo data generator (random data, same tables) so the dashboard can be shared
-- [ ] Publish the Power BI dashboard (GitHub Pages, like the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse))
-- [ ] Lead rate and CPL per ad as Power BI measures, from CRM leads matched through UTM
-- [ ] Pixel conversions (form-fill event) in the fact table, to compare with CRM leads
 
 ## Related
 
