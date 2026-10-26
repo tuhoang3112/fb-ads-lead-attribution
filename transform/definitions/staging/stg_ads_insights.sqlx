@@ -82,6 +82,12 @@ SELECT
    FROM UNNEST(JSON_QUERY_ARRAY(actions)) AS x
    WHERE JSON_VALUE(x, '$.action_type') = 'landing_page_view') AS landing_page_views,
 
+  -- messaging_conversations_started: số cuộc hội thoại được mở từ ads (mục tiêu Engagement).
+  -- Cũng chỉ có trong mảng actions; hậu tố _7d là cửa sổ attribution
+  (SELECT SAFE_CAST(JSON_VALUE(x, '$.value') AS NUMERIC)
+   FROM UNNEST(JSON_QUERY_ARRAY(actions)) AS x
+   WHERE JSON_VALUE(x, '$.action_type') = 'onsite_conversion.messaging_conversation_started_7d') AS messaging_conversations_started,
+
   -- view_content: xem nội dung/trang sản phẩm sau khi click, tín hiệu quan tâm gần
   -- với landing_page_view. Facebook ghi nhận trùng qua 3 action_type khác nhau
   -- (view_content/onsite_web_view_content/omni_view_content) nên chỉ lấy 1,

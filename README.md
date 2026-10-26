@@ -100,7 +100,7 @@ flowchart TD
 
 | Table | Grain | Notes |
 |---|---|---|
-| `fact_ad_performance` | 1 row per ad per day | Measures only: spend, reach, impressions, frequency, clicks, link clicks, landing page views |
+| `fact_ad_performance` | 1 row per ad per day | Measures only: spend, reach, impressions, frequency, clicks, link clicks, landing page views, messaging conversations started |
 | `dim_ads` | 1 row per ad | CTA link, UTM, ad type, post link, **course name** |
 | `dim_ad_sets` | 1 row per ad set | Effective budget (CBO / ABO) and flattened targeting |
 | `dim_campaigns` | 1 row per campaign | Objective, status, account name |
@@ -151,6 +151,7 @@ erDiagram
     int reach
     int inline_link_clicks
     numeric landing_page_views
+    numeric messaging_conversations_started
   }
   fact_deal {
     string deal_id PK
