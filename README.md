@@ -2,8 +2,6 @@
 
 > A **Power BI dashboard** that shows how Facebook Ads perform against their objective and how many **leads (registrations) each ad converts**. It reads a BigQuery **data mart** (clean tables, ready for analysis) fed daily by **Airbyte → BigQuery → Dataform**, and joins ads to CRM leads through the **UTM** in each ad's link. This is the **ads side** of the company data warehouse; the **CRM side** is [crm-data-warehouse](https://github.com/tuhoang3112/crm-data-warehouse), in the same BigQuery warehouse.
 
-> **Status:** the data pipeline and data mart are built (this repo). The Power BI model and the dashboard are being added to this repository step by step, with demo data so they can be shared.
-
 ---
 
 ## The problem
