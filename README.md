@@ -127,7 +127,7 @@ erDiagram
   dim_ad_sets {
     string ad_set_id PK
     string campaign_id FK
-    string budget_level "CBO or ABO"
+    string budget_level
     string targeting_age_range
     string targeting_interests
   }
@@ -138,12 +138,12 @@ erDiagram
     string ad_cta_link
     string ad_utm_campaign
     string ad_utm_content
-    string utm_tracking "custom column"
+    string utm_tracking
     string course_name
   }
   fact_ad_performance {
     string ad_id FK
-    date date_start
+    date date_start FK
     numeric spend
     int impressions
     int reach
@@ -152,7 +152,7 @@ erDiagram
   }
   fact_deal {
     string deal_id PK
-    timestamp created_at
+    timestamp created_at FK
     string deal_status
     numeric deal_value
     string course_selected
@@ -160,7 +160,7 @@ erDiagram
     string utm_medium
     string utm_product
     string utm_content
-    string utm_tracking "custom column"
+    string utm_tracking FK
   }
   dim_date {
     date date PK
