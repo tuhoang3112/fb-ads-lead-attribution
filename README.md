@@ -136,6 +136,8 @@ erDiagram
     string ad_set_id FK
     string ad_name
     string ad_cta_link
+    string ad_utm_source
+    string ad_utm_medium
     string ad_utm_campaign
     string ad_utm_content
     string utm_tracking
