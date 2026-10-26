@@ -140,7 +140,6 @@ erDiagram
     string ad_utm_medium
     string ad_utm_campaign
     string ad_utm_content
-    string ad_utm_product
     string utm_tracking
     string course_name
   }
@@ -164,7 +163,6 @@ erDiagram
     string utm_medium
     string utm_campaign
     string utm_content
-    string utm_product
     string utm_tracking FK
   }
   dim_date {
@@ -174,7 +172,7 @@ erDiagram
 ```
 
 - **From the data mart:** `dim_campaigns`, `dim_ad_sets`, `dim_ads`, `fact_ad_performance`
-- **From the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse):** `fact_deal`, the lead table, taken as it is. It is joined to the ads through one column, `utm_tracking`: the five UTM columns (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_product`, and their `ad_` versions in `dim_ads`) combined into a single custom column, built in Power BI on both tables
+- **From the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse):** `fact_deal`, the lead table, taken as it is. It is joined to the ads through one column, `utm_tracking`: the four UTM columns (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, and their `ad_` versions in `dim_ads`) combined into a single custom column, built in Power BI on both tables
 - **Created in Power BI:** `dim_date` (DAX)
 
 → [Data Dictionary](docs/data-dictionary.md) · [Metric Definitions](docs/metric-definitions.md)
