@@ -23,6 +23,7 @@ Star schema at **ad** grain: `fact_ad_performance` joins to `dim_ads`, which joi
 | `clicks` | All clicks (links, likes, comments, shares) |
 | `inline_link_clicks` | Clicks on the link in the ad (the Traffic metric) |
 | `landing_page_views` | People who reached the landing page |
+| `messaging_conversations_started` | Conversations started from the ad (Engagement objective) |
 
 ## `dim_ads`
 

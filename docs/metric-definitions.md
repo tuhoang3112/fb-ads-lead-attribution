@@ -27,7 +27,7 @@ Goal: brand / product recognition.
 
 Goal: start a conversation so Sales can advise and close by chat.
 
-Ads for messages still run, in a smaller share than the lead ads. The dashboard shows both metrics: in the Ads Detail table and in the Top Messaging Started Ads chart. They are not extracted into this mart yet.
+Ads for messages still run, in a smaller share than the lead ads. The dashboard shows both metrics: in the Ads Detail table and in the Top Messaging Started Ads chart.
 
 | Metric | Formula |
 |---|---|

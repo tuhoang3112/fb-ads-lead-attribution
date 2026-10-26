@@ -100,7 +100,7 @@ flowchart TD
 
 | Table | Grain | Notes |
 |---|---|---|
-| `fact_ad_performance` | 1 row per ad per day | Measures only: spend, reach, impressions, frequency, clicks, link clicks, landing page views |
+| `fact_ad_performance` | 1 row per ad per day | Measures only: spend, reach, impressions, frequency, clicks, link clicks, landing page views, messaging conversations started |
 | `dim_ads` | 1 row per ad | CTA link, UTM, ad type, post link, **course name** |
 | `dim_ad_sets` | 1 row per ad set | Effective budget (CBO / ABO) and flattened targeting |
 | `dim_campaigns` | 1 row per campaign | Objective, status, account name |
@@ -113,7 +113,6 @@ erDiagram
   dim_campaigns ||--o{ dim_ad_sets : "has"
   dim_ad_sets ||--o{ dim_ads : "has"
   dim_ads ||--o{ fact_ad_performance : "daily metrics"
-  dim_ad_course_mapping }o..o{ dim_ads : "course by ad name rules"
   dim_ads ||--o{ fact_deal : "utm_tracking (1 UTM = 1 ad)"
   dim_date ||--o{ fact_ad_performance : "date"
   dim_date ||--o{ fact_deal : "created date"
@@ -128,7 +127,7 @@ erDiagram
   dim_ad_sets {
     string ad_set_id PK
     string campaign_id FK
-    string budget_level "CBO or ABO"
+    string budget_level
     string targeting_age_range
     string targeting_interests
   }
@@ -137,37 +136,34 @@ erDiagram
     string ad_set_id FK
     string ad_name
     string ad_cta_link
+    string ad_utm_source
+    string ad_utm_medium
     string ad_utm_campaign
     string ad_utm_content
-    string utm_tracking "custom column"
+    string utm_tracking
     string course_name
   }
   fact_ad_performance {
     string ad_id FK
-    date date_start
+    date date_start FK
     numeric spend
     int impressions
     int reach
     int inline_link_clicks
     numeric landing_page_views
-  }
-  dim_ad_course_mapping {
-    string mapping_type
-    string ad_key
-    string campaign_pattern
-    string course_selected
+    numeric messaging_conversations_started
   }
   fact_deal {
     string deal_id PK
-    timestamp created_at
+    timestamp created_at FK
     string deal_status
     numeric deal_value
     string course_selected
     string utm_source
     string utm_medium
-    string utm_product
+    string utm_campaign
     string utm_content
-    string utm_tracking "custom column"
+    string utm_tracking FK
   }
   dim_date {
     date date PK
@@ -175,8 +171,8 @@ erDiagram
   }
 ```
 
-- **From the data mart:** `dim_campaigns`, `dim_ad_sets`, `dim_ads`, `fact_ad_performance`, `dim_ad_course_mapping`
-- **From the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse):** `fact_deal`, the lead table, taken as it is. It is joined to the ads through one column, `utm_tracking`: the UTM columns combined into a single custom column, built in Power BI on both `dim_ads` and `fact_deal`
+- **From the data mart:** `dim_campaigns`, `dim_ad_sets`, `dim_ads`, `fact_ad_performance`
+- **From the [CRM project](https://github.com/tuhoang3112/crm-data-warehouse):** `fact_deal`, the lead table, taken as it is. It is joined to the ads through one column, `utm_tracking`: the four UTM columns (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, and their `ad_` versions in `dim_ads`) combined into a single custom column, built in Power BI on both tables
 - **Created in Power BI:** `dim_date` (DAX)
 
 → [Data Dictionary](docs/data-dictionary.md) · [Metric Definitions](docs/metric-definitions.md)

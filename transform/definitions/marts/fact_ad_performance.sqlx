@@ -14,6 +14,7 @@ SELECT
   frequency,
   clicks,
   inline_link_clicks,
-  landing_page_views
+  landing_page_views,
+  messaging_conversations_started
 
 FROM ${ref("stg_ads_insights")}
